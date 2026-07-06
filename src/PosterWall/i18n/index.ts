@@ -1,0 +1,104 @@
+type Locale = 'zh' | 'en';
+
+const zh = {
+  title: 'Gig Wall',
+  subtitle: '生成一张演出海报，贴上公共墙。',
+  visible: '墙上',
+  mine: '我的',
+  generating: '生成中',
+  loading: '加载中',
+  retry: '重试',
+  wall: '演出海报墙',
+  backToWall: '返回墙面',
+  complete: '已贴上墙',
+  profileHint: '建立头像可以得到更个人化的头像高级演出海报。',
+  noAvatarBadge: '基础演出海报',
+  avatarBadge: '头像高级演出海报',
+  openProfile: '打开 {n} 的主页',
+  self: 'YOU',
+  offPlatform: '生产环境会读取 Aigram 头像；当前是独立预览。',
+  stagePrep: '取样制版',
+  stageSpray: '上墨套印',
+  stageSeal: '晾干预载',
+  craftCtaTitle: '进入印刷间',
+  craftCtaSubAvatar: '用你的头像生成一张高级演出海报',
+  craftCtaSubBasic: '先做一张基础演出海报，头像可稍后补强',
+  craftCooldownTitle: '印刷间封存中',
+  craftCooldownSub: '{n} 后开放下一张海报',
+  like: '喜欢',
+  liked: '已喜欢',
+  comments: '留言',
+  noComments: '还没有留言，给这张海报留第一道墙评。',
+  commentPlaceholder: '给这张海报留一句话',
+  sendComment: '发送',
+  commentCount: '{n} 条留言',
+  likeCount: '{n} 人喜欢',
+  productionKicker: '印刷中',
+  productionTitle: '正在把海报印出来',
+  productionPosterSide: '海报纸',
+  productionArtAvatar: '正在读取头像里的轮廓、发色和气质，把它转译成地下演出海报，不会直接贴原头像。',
+  productionArtBasic: '正在生成基础演出海报：乐队标题、场次票根、粗印刷、半调网点和居中构图会优先处理。',
+  productionSaving: '海报图已经完成，正在晾干、写入作品墙，并预载最终详情。',
+  productionNote0: '头像只提供气质和特征，最终会变成原创海报图形。',
+  productionNote1: '用户名可能变成艺名缩写、竖排字组、票根编号或半可读演出标题。',
+  productionNote2: '图像会先铺满矩形，贴墙时再用纸张边缘和撕裂效果处理。',
+  productionNote3: '详情页会保留完整海报，并叠加胶带、墙面和纸张阴影。',
+};
+
+const en: typeof zh = {
+  title: 'Gig Wall',
+  subtitle: 'Generate a gig poster and paste it on the wall.',
+  visible: 'Wall',
+  mine: 'Mine',
+  generating: 'Generating',
+  loading: 'Loading',
+  retry: 'Retry',
+  wall: 'Gig poster wall',
+  backToWall: 'Back to wall',
+  complete: 'Pasted',
+  profileHint: 'Create an avatar to get a more personal premium gig poster.',
+  noAvatarBadge: 'Basic gig poster',
+  avatarBadge: 'Avatar gig poster',
+  openProfile: "Open {n}'s profile",
+  self: 'YOU',
+  offPlatform: 'Aigram will provide the avatar in production. This is standalone preview.',
+  stagePrep: 'Plating',
+  stageSpray: 'Inking',
+  stageSeal: 'Drying images',
+  craftCtaTitle: 'Enter the print room',
+  craftCtaSubAvatar: 'Turn your avatar into a premium gig poster',
+  craftCtaSubBasic: 'Make a basic gig poster now; add an avatar later',
+  craftCooldownTitle: 'Print room sealed',
+  craftCooldownSub: 'Next poster opens in {n}',
+  like: 'Like',
+  liked: 'Liked',
+  comments: 'Notes',
+  noComments: 'No notes yet. Leave the first mark on this poster.',
+  commentPlaceholder: 'Leave a note on this poster',
+  sendComment: 'Send',
+  commentCount: '{n} notes',
+  likeCount: '{n} likes',
+  productionKicker: 'Printing',
+  productionTitle: 'Making your poster',
+  productionPosterSide: 'Poster paper',
+  productionArtAvatar: 'Reading avatar shape, hair, and attitude, then translating them into an underground gig poster without pasting the photo.',
+  productionArtBasic: 'Building a basic gig poster with band title blocks, ticket scraps, rough screenprint, halftone dots, and centered composition.',
+  productionSaving: 'The poster is ready. Drying it, saving it to the wall, and preloading the final detail image.',
+  productionNote0: 'The avatar supplies traits and attitude; the result becomes original poster art.',
+  productionNote1: 'The name may become an artist alias, initials, vertical type, ticket numbers, or half-readable show titles.',
+  productionNote2: 'The image is generated full-bleed first, then paper edges and tear effects frame it on the wall.',
+  productionNote3: 'The detail view keeps the full poster and adds tape, wall texture, and paper shadow.',
+};
+
+function detectLocale(): Locale {
+  const override = localStorage.getItem('game_locale');
+  if (override === 'en' || override === 'zh') return override;
+  return navigator.language.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+}
+
+export function t(key: keyof typeof zh, vars?: { n?: number | string }): string {
+  const dict = detectLocale() === 'zh' ? zh : en;
+  let value = dict[key] || zh[key] || String(key);
+  if (vars?.n !== undefined) value = value.replace('{n}', String(vars.n));
+  return value;
+}

@@ -1,0 +1,10 @@
+node_modules
+dist
+_qa
+.DS_Store
+scripts/_hero/
+scripts/*.log
+__pycache__/
+public/img/review-back.svg
+public/img/review-deck-sheet.jpg
+public/img/review-decks/
