@@ -276,14 +276,31 @@ export default function PosterWall() {
               className={viewMode === 'stack' ? 'is-active' : ''}
               onClick={() => setViewMode('stack')}
             >
-              {t('stackView')}
+              <span className="pw-view-toggle__icon pw-view-toggle__icon--stack" aria-hidden>
+                <i />
+                <i />
+                <i />
+              </span>
+              <span className="pw-view-toggle__copy">
+                <strong>{t('stackView')}</strong>
+                <small>{t('stackHint')}</small>
+              </span>
             </button>
             <button
               type="button"
               className={viewMode === 'grid' ? 'is-active' : ''}
               onClick={() => setViewMode('grid')}
             >
-              {t('gridView')}
+              <span className="pw-view-toggle__icon pw-view-toggle__icon--grid" aria-hidden>
+                <i />
+                <i />
+                <i />
+                <i />
+              </span>
+              <span className="pw-view-toggle__copy">
+                <strong>{t('gridView')}</strong>
+                <small>{t('gridHint')}</small>
+              </span>
             </button>
           </div>
         </header>

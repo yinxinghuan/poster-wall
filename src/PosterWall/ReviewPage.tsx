@@ -22,12 +22,23 @@ function ModePreview({ mode }: { mode: 'stack' | 'grid' }) {
   return (
     <div className={`pwr-mode pwr-mode--${mode}`}>
       <header>
-        <div>
+        <div className="pwr-mode-title">
           <span>POSTER WALL</span>
           <strong>TONIGHT</strong>
           <small>WALL / MINE  12 / 4</small>
         </div>
-        <em>{mode === 'stack' ? 'STACK' : 'GRID'}</em>
+        <div className="pwr-mode-switch" aria-hidden>
+          <span className={mode === 'stack' ? 'is-active' : ''}>
+            <i className="pwr-mode-switch__icon pwr-mode-switch__icon--stack"><b /><b /><b /></i>
+            <strong>STACK</strong>
+            <small>Overlap</small>
+          </span>
+          <span className={mode === 'grid' ? 'is-active' : ''}>
+            <i className="pwr-mode-switch__icon pwr-mode-switch__icon--grid"><b /><b /><b /><b /></i>
+            <strong>GRID</strong>
+            <small>Order</small>
+          </span>
+        </div>
       </header>
       <div className="pwr-mode__deck" aria-hidden>
         {Array.from({ length: 10 }, (_, index) => <MiniPoster key={index} index={index} />)}
