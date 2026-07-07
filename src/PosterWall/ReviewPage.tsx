@@ -8,9 +8,9 @@ const candidates = [
   {
     id: 'gallery',
     label: 'A',
-    title: 'Gallery Black',
-    caption: 'Quiet black-box frame. UI behaves like museum labels and lets the poster stack carry the drama.',
-    meta: 'Calmest / safest',
+    title: 'Subway Helvetica',
+    caption: 'A black station-sign frame: Helvetica hierarchy, one route mark, simple controls, and no extra visual noise.',
+    meta: 'Cleanest / signage-led',
   },
   {
     id: 'pass',
@@ -48,25 +48,25 @@ function CandidatePhone({ candidate }: { candidate: typeof candidates[number] })
       <div className="pwr-candidate__phone">
         <header className="pwr-candidate__top">
           <div>
-            <span>POSTER WALL</span>
-            <strong>TONIGHT</strong>
-            <small>WALL / MINE 12 / 4</small>
+            <span>Poster Wall</span>
+            <strong>Tonight</strong>
+            <small>Wall 12 · Mine 4</small>
           </div>
           <nav aria-hidden>
-            <b>STACK</b>
-            <b>GRID</b>
+            <b>Stack</b>
+            <b>Grid</b>
           </nav>
         </header>
         <div className="pwr-candidate__deck" aria-hidden>
           {Array.from({ length: 10 }, (_, index) => <MiniPoster key={index} index={index} />)}
         </div>
         <footer className="pwr-candidate__bottom">
-          <span className="pwr-candidate__avatar">?</span>
+          <span className="pwr-candidate__avatar">{candidate.id === 'gallery' ? 'A' : '?'}</span>
           <div>
             <strong>Basic poster</strong>
             <small>Avatar traits become poster language</small>
           </div>
-          <button type="button">Make</button>
+          <button type="button">Make poster</button>
         </footer>
       </div>
       <div className="pwr-candidate__copy">
@@ -86,19 +86,19 @@ function ModePreview({ mode }: { mode: 'stack' | 'grid' }) {
     <div className={`pwr-mode pwr-mode--${mode}`}>
       <header>
         <div className="pwr-mode-title">
-          <span>POSTER WALL</span>
-          <strong>TONIGHT</strong>
-          <small>WALL / MINE  12 / 4</small>
+          <span>Poster Wall</span>
+          <strong>Tonight</strong>
+          <small>Wall 12 · Mine 4</small>
         </div>
         <div className="pwr-mode-switch" aria-hidden>
           <span className={mode === 'stack' ? 'is-active' : ''}>
             <i className="pwr-mode-switch__icon pwr-mode-switch__icon--stack"><b /><b /><b /></i>
-            <strong>STACK</strong>
+            <strong>Stack</strong>
             <small>Overlap</small>
           </span>
           <span className={mode === 'grid' ? 'is-active' : ''}>
             <i className="pwr-mode-switch__icon pwr-mode-switch__icon--grid"><b /><b /><b /><b /></i>
-            <strong>GRID</strong>
+            <strong>Grid</strong>
             <small>Order</small>
           </span>
         </div>
@@ -108,7 +108,7 @@ function ModePreview({ mode }: { mode: 'stack' | 'grid' }) {
       </div>
       <footer>
         <span>Avatar traits become poster language</span>
-        <button>MAKE</button>
+        <button>Make</button>
       </footer>
     </div>
   );
@@ -127,7 +127,7 @@ function StateCard({
     <section className={`pwr-state pwr-state--${mode}`}>
       <header>
         <span>{title}</span>
-        <strong>{mode === 'basic' ? 'BASIC' : mode === 'avatar' ? 'AVATAR' : mode === 'generating' ? 'PROCESS' : 'DETAIL'}</strong>
+        <strong>{mode === 'basic' ? 'Basic' : mode === 'avatar' ? 'Avatar' : mode === 'generating' ? 'Process' : 'Detail'}</strong>
       </header>
       {mode === 'generating' ? (
         <div className="pwr-state__press">
@@ -200,7 +200,7 @@ export default function ReviewPage() {
           </div>
         </div>
         <div className="pwr-detail-card">
-          <button type="button">← BACK</button>
+          <button type="button">← Back</button>
           <MiniPoster index={4} />
           <footer>
             <span className="pwr-avatar">G</span>
@@ -226,7 +226,7 @@ export default function ReviewPage() {
           {REVIEW_POSTER_IMAGES.slice(0, 6).map((src, index) => (
             <figure key={src}>
               <img src={src} alt={`Generated poster sample ${index + 1}`} draggable={false} />
-              <figcaption>{index % 3 === 0 ? 'BASIC' : 'AVATAR REF'}</figcaption>
+              <figcaption>{index % 3 === 0 ? 'Basic' : 'Avatar ref'}</figcaption>
             </figure>
           ))}
         </div>
