@@ -24,8 +24,9 @@
 ## 3. 核心模块
 
 - 状态管理：`usePosterWall()` 用 `useGameSave<PosterSave>('poster-wall')` 加本地 `mirror`，只在 `savedData` 首次加载后 seed 一次，后续所有写入都从 mirror 读改写，避免多次生成覆盖旧作品。`PosterSave` 包含 `posters`、`totalGenerated`、`messages`、`likes`、`lastGeneratedAt`。
-- 生成逻辑：`generatePoster()` 先检查 `canCraft`，冷却由 `(lastGeneratedAt + 12h - Date.now())` 计算，不依赖平台日统计。有头像时把 `profile.head_url` 作为 `ref_url` 传给 `useGenImage.generate()`；无头像时只传基础演出海报 prompt。头像 prompt 明确头像只作为二创参考，只提取脸型轮廓、发型方向、表情气质、色彩温度、配饰暗示和 attitude，再转译为场馆导视、后台通行牌、喜剧博物馆标牌、时装周排期或欧洲演出 flyer 语言，禁止直接贴头像、复刻照片构图、照片感头像或儿童漫画化。
-- 用户名图形化：`nameGraphicLine(profile.name)` 会把用户名作为可选图案素材注入 prompt，允许转成超大裁切字母、缩写、横竖排、access code、edition number、箭头标签或半可读演出标题，要求偏中间且不作为普通署名。
+- 生成逻辑：`generatePoster()` 先检查 `canCraft`，冷却由 `(lastGeneratedAt + 12h - Date.now())` 计算，不依赖平台日统计。有头像时把 `profile.head_url` 作为 `ref_url` 传给 `useGenImage.generate()`；无头像时只传文本 prompt，并把用户名作为主视觉身份来源。
+- 模板池：`PROMPT_TEMPLATES` 定义 9 个海报模板，覆盖 `hex-zine-portrait`、`upstairs-handbill`、`tokyo-pulp-flyer`、`subway-showbill`、`swiss-type-system`、`color-block-program`、`fashion-week-roster`、`museum-comedy-label`、`xerox-photo-silhouette`。`buildPosterPrompt(mode,userName,seed)` 会按 `avatar/username` 模式筛选模板，使用 `seedScore()` 和 `pickForSeed()` 根据 `draftId + createdAt` 稳定抽取模板、色彩和字体策略，返回 `prompt`、`posterTone` 和 `templateId`，并写入 `PosterEntry.posterTemplate`。`subway-showbill`、`swiss-type-system`、`color-block-program` 当前只在 `avatar` 模式中启用；无头像 txt2img 纯排版模板测试中高概率生成墙面 mockup，等后续新增无文字平面参考资产后再恢复。
+- 头像与用户名图形化：有头像时 `AVATAR_IDENTITY_RULE` 要求头像只作为二创参考，提取脸型轮廓、发型方向、表情气质、色彩温度、配饰暗示和 attitude，再转成成熟的演出海报人物、舞台符号或印刷肖像，禁止直接贴头像、复刻照片构图、照片感头像或儿童漫画化。无头像时 `USERNAME_IDENTITY_RULE` 要求用户名成为主视觉：大面积裁切字母、首字母、票据编码、场馆戳、手写 stage name、vertical fragments 或半可读标题，而不是普通署名。`nameGraphicLine(profile.name)` 在两种模式下都会把用户名作为可选图案素材注入 prompt，要求偏中间。
 - 图像边界：生成 prompt 要求输出满版竖向矩形演出海报，主体居中，不能包含 app UI、手机 mockup、墙面背景、外框、胶带、留白、滑板、轮子、通缉单套话、抗议标语牌或外部品牌 Logo；纸张边缘、胶带和墙面阴影由 CSS 负责。
 - 图片预载：`generatePoster()` 在 `useGenImage.generate()` 返回 URL 后进入 `saving` 阶段，调用 `preloadImage()` 用 `new Image()` 加载并在支持时调用 `image.decode()`；最长等待 16 秒。只有预载结束后才写入 mirror、`persist()` 并打开详情页，降低首次详情看到空白图片的概率。
 - 公共墙：`refreshWall()` 调 `/note/aigram/ai/game/get/data/list`，flatten 每个用户存档里的全部 `posters`，按 `createdAt` 倒序截取 24 个，不只取最新一张。同一次 rows 会传给 `messagesByTarget()` 和 `likesByTarget()`，按作品 id 聚合互动，再解析相关用户 profile，为作者、留言者和点赞者补 `name/head_url`。
@@ -39,7 +40,7 @@
 
 ## 4. 扩展点
 
-- 改生成风格：编辑 `src/PosterWall/hooks/usePosterWall.ts` 的 `avatarPromptFor()`、`basicPromptFor()` 和 `nameGraphicLine()`。
+- 改生成风格：编辑 `src/PosterWall/hooks/usePosterWall.ts` 的 `PROMPT_TEMPLATES`、`AVATAR_IDENTITY_RULE`、`USERNAME_IDENTITY_RULE` 和 `nameGraphicLine()`；新增模板时设置 `id`、`mode`、`tone`、`concept`、`layout`、`palette`、`typography`、`identity`。
 - 改制作频率：编辑 `CRAFT_COOLDOWN_MS`；当前为 12 小时。
 - 改墙面布局：编辑 `src/PosterWall/PosterWall.less` 的 `.pw-wall`、`.pw-card`、`.pw-card__paper`，以及 `src/PosterWall/PosterWall.tsx` 的 `posterStyle()` 行列错位和旋转参数。
 - 改详情页：编辑 `src/PosterWall/PosterWall.tsx` 的 `.pw-detail` 结构，以及 `PosterWall.less` 的 `.pw-detail*`、`.pw-author-card*`、`.pw-comment*` 样式。

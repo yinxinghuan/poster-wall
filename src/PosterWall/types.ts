@@ -15,6 +15,7 @@ export interface PosterEntry {
   prompt: string;
   hasAvatar: boolean;
   posterTone?: PosterTone;
+  posterTemplate?: string;
   userId: string;
   userName?: string;
   userAvatarUrl?: string;

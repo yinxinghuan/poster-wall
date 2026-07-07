@@ -49,37 +49,171 @@ function nameGraphicLine(userName?: string) {
   ].join(' ');
 }
 
-function avatarPromptFor(userName?: string) {
-  return [
-    'Full-bleed vertical graphic event poster, clean flat design, inspired by venue wayfinding signs, comedy museum labels, backstage placards, fashion-week schedules, and bold European gig flyers.',
-    'Use the reference avatar only as raw identity inspiration. Extract broad traits only: face silhouette, hairstyle direction, expression energy, color temperature, accessory hints, and attitude.',
-    'Reinvent those traits as an original event identity poster: a club night poster, band tour placard, festival side-stage bill, experimental live show flyer, or backstage access graphic.',
-    nameGraphicLine(userName),
-    'Visual language: saturated single-color or two-color background, huge condensed black or cream typography, cut-corner sign panels, arrows, numbers, edition codes, date/time blocks, short fake lineup fragments, clean grids, hard edges, strong negative space, minimal symbols.',
-    'The final artwork should feel like a second-generation graphic poster interpretation of the person, not a pasted avatar and not a literal photo portrait.',
-    'Artwork fills the entire rectangular image edge to edge, with the strongest visual mass centered. It should read clearly when stacked behind other posters.',
-    'Do not preserve the exact face, do not copy the photo composition, do not paste a circular avatar, do not create a photorealistic headshot, do not make a cute caricature.',
-    'Do not include app UI, phone mockup, surrounding wall background, paper tape, torn edges, blank margins, standalone logo, skateboard, wheels, trucks, protest placards, wanted-poster cliches, or childish styling.',
-  ].join(' ');
+type PosterPromptMode = 'avatar' | 'username';
+
+interface PosterPromptTemplate {
+  id: string;
+  mode: PosterPromptMode | 'both';
+  tone: PosterTone;
+  concept: string;
+  layout: string;
+  palette: string[];
+  typography: string[];
+  identity: string;
 }
 
-function basicPromptFor(userName?: string) {
-  return [
-    'Full-bleed vertical graphic event poster, clean flat design, venue wayfinding sign language, bold typographic placard, high contrast, saturated color field.',
-    nameGraphicLine(userName),
-    'Use oversized condensed black or cream typography, cut-corner color blocks, arrows, edition numbers, date/time blocks, fake lineup fragments, venue labels, hard geometric composition, clean grids, minimal symbols, strong centered visual mass.',
-    'The artwork fills the entire rectangular image edge to edge. It must look like a designed poster, not a scene, not a wall mockup, not a UI screenshot.',
-    'Do not include app UI, phone mockup, surrounding wall background, paper tape, torn edges, blank margins, portrait, skateboard, wheels, trucks, or readable external brand logos.',
-  ].join(' ');
+const POSTER_PROMPT_BASE = [
+  'Create one square flat 2D event-poster graphic composition.',
+  'The whole square canvas must be the artwork surface itself: typography, color blocks, portrait marks, symbols, and print texture placed directly on the canvas.',
+  'Do not depict a physical poster object. Do not show a sheet of paper, printed page, poster board, hanging print, framed print, photographed print, or mockup.',
+  'The output must be only the pure artwork, edge to edge. No outer frame, no inner frame, no border, no white mat, no paper edge, no taped corner, no sticker decoration around the poster, no hanging hardware, no drop shadow outside the artwork.',
+  'Do not show the poster photographed in any real-world environment. No wall, brick, tile, table, paper tape, frame, phone, hand, shadow outside the artwork, product mockup, poster mockup, or poster hanging scene.',
+  'No camera, no perspective view, no realistic lighting, no 3D depth, no physical materials. The square must not contain a smaller rectangular poster sheet inside it.',
+  'The image will be center-cropped into a 2:3 vertical card, so keep the main face, name lettering, title mass, symbols, and strongest composition inside the center vertical safe area.',
+  'Extend color, print grain, secondary marks, and texture all the way to every edge.',
+  'Use fictional venue and show text only. Text may be hand-lettered, fragmented, cropped, semi-readable, or imperfect, as long as the design feels intentional.',
+  'This must feel like mature designed print culture: gig flyer, showbill, zine poster, venue placard, or indie event poster.',
+  'Do not create app UI, social-media story UI, blank margin, external brand logo, skateboard, wheels, trucks, wanted poster, childish cartoon, or generic digital poster.',
+  'If any border-like shape appears, it must be part of internal typography or artwork only, never an outer frame around the poster.',
+].join(' ');
+
+const AVATAR_IDENTITY_RULE = [
+  'Use the reference avatar as the social identity source.',
+  'Reinterpret broad traits only: face silhouette, hair direction, expression energy, color temperature, accessory hints, and attitude.',
+  'The user must be visibly present as a designed performer portrait, symbolic stage icon, or print-culture character.',
+  'Redraw the identity in flat ink, risograph, linocut, halftone, vector, or screenprint language. No photographic skin, no camera lighting, no pasted photo, no circular avatar, no selfie, no photorealistic headshot, and no cute caricature.',
+].join(' ');
+
+const USERNAME_IDENTITY_RULE = [
+  'There is no avatar. Use the user name as the social identity source.',
+  'Turn the name into the main 2D graphic: large cropped letters, initials, vertical fragments, ticket-code typography, venue stamp, hand-lettered stage name, or half-readable title mass.',
+  'The name should feel integrated into the design, not placed as a plain signature.',
+  'All lettering must sit directly on the flat design canvas, never on a photographed sheet, wall, signboard, or framed object.',
+].join(' ');
+
+const PROMPT_TEMPLATES: PosterPromptTemplate[] = [
+  {
+    id: 'hex-zine-portrait',
+    mode: 'both',
+    tone: 'acid',
+    concept: 'underground zine night, warning signage, occult diagram marks, xerox grit, serious after-hours energy',
+    layout: 'one heavy central icon, small astronomy diagrams, safety pictograms, condensed title fragments stacked around the center',
+    palette: ['acid yellow and deep black only', 'safety orange and black with dirty cream ink', 'black paper with sulfur yellow ink'],
+    typography: ['rough condensed block type', 'stamped hazard labels', 'cropped all-night show codes'],
+    identity: 'For avatar mode, turn the face into a central engraved performer head. For username mode, turn the name into a hazard-label title and warning-code fragments.',
+  },
+  {
+    id: 'upstairs-handbill',
+    mode: 'both',
+    tone: 'paper',
+    concept: 'local underground music and comedy flyer, art-school handbill, casual venue-night charm',
+    layout: 'flat paper field, loose marker arrows, wavy lines, one sitting or leaning performer silhouette, small venue metadata along the edges',
+    palette: ['pastel cyan, red, cream, and black', 'soft yellow paper with red marker and black ink', 'dusty pink paper with green and black ink'],
+    typography: ['hand-lettered headline', 'marker arrows', 'imperfect small event notes'],
+    identity: 'For avatar mode, make the performer silhouette inherit the avatar face and hair. For username mode, turn the name into messy stage lettering across the central third.',
+  },
+  {
+    id: 'tokyo-pulp-flyer',
+    mode: 'both',
+    tone: 'neon',
+    concept: 'Tokyo indie flyer meets board-game insert, snack-packaging energy, funny but mature weirdness',
+    layout: 'large expressive central character or mascot-like performer, dense side labels, oversized title shapes, screenprint registration texture',
+    palette: ['saturated red, teal, pink, cream, and black', 'cobalt blue, hot pink, rice paper, and ink black', 'tomato red, mint green, pale blue, and black'],
+    typography: ['distorted hand-painted Latin letters', 'kana-like Latin fragments', 'small fake catalog stamps'],
+    identity: 'For avatar mode, derive the central face from the avatar. For username mode, make the name huge, playful, and cropped like packaging typography.',
+  },
+  {
+    id: 'subway-showbill',
+    mode: 'avatar',
+    tone: 'paper',
+    concept: 'pure flat graphic-design showbill, neutral grotesk type, subway poster discipline, restrained but bold',
+    layout: 'one saturated color field, strict vertical alignment, ticket-rule lines, date block, venue line, one simple sound-wave or arrow symbol, no illustrated scene',
+    palette: ['green paper with black and cream type', 'blue paper with black and off-white type', 'warm red paper with black and pale yellow type'],
+    typography: ['neutral grotesk headline', 'tight ticket metadata', 'large cropped initials'],
+    identity: 'For avatar mode, reduce the avatar into a flat two-color portrait symbol or simple identity mark. For username mode, make the name the loud central typographic block.',
+  },
+  {
+    id: 'swiss-type-system',
+    mode: 'avatar',
+    tone: 'paper',
+    concept: 'pure Swiss graphic design concert programme, all structure, typography, spacing, and measured tension',
+    layout: 'strict asymmetric grid, oversized name block, small venue metadata, thin rule lines, numbered sections, one abstract circle or slash mark, no illustration scene',
+    palette: ['off-white, black, and signal red', 'pale grey, black, and cobalt blue', 'butter yellow, black, and one green accent'],
+    typography: ['Helvetica-like grotesk typography', 'tight numeric programme labels', 'oversized cropped initials'],
+    identity: 'For avatar mode, translate the avatar into one minimal flat monogram portrait mark plus coded metadata. For username mode, treat the name as the entire poster architecture.',
+  },
+  {
+    id: 'color-block-program',
+    mode: 'avatar',
+    tone: 'neon',
+    concept: 'pure square digital graphic system, bold color blocks, Bauhaus-like stage programme, no representational illustration and no physical object',
+    layout: 'large overlapping rectangles and circles printed directly to the canvas edges, one diagonal rule, number column, central name or identity symbol, precise negative space',
+    palette: ['red, yellow, blue, black, and cream', 'cyan, magenta, black, and white', 'emerald, orange, cream, and black'],
+    typography: ['large grotesk letters locked to color blocks', 'tiny serial numbers', 'simple programme captions'],
+    identity: 'For avatar mode, reduce face and hair into abstract flat shapes and a two-color emblem. For username mode, let the name break across the color blocks as a graphic object.',
+  },
+  {
+    id: 'fashion-week-roster',
+    mode: 'both',
+    tone: 'neon',
+    concept: 'fashion-week schedule poster translated into live-show culture, editorial and high contrast',
+    layout: 'overlapping roster blocks, edition number, large date, vertical name fragments, clean grid with one disruptive symbol',
+    palette: ['electric yellow, black, and small magenta accents', 'mint green, black, and cream', 'pale lavender, black, and red'],
+    typography: ['oversized compressed roster type', 'thin rule lines', 'tiny edition codes'],
+    identity: 'For avatar mode, turn the avatar into a fashion-campaign performer mark. For username mode, split the name into roster entries and oversized initials.',
+  },
+  {
+    id: 'museum-comedy-label',
+    mode: 'both',
+    tone: 'acid',
+    concept: 'comedy museum signage, backstage labels, wayfinding panels, deadpan institutional humor',
+    layout: 'cut-corner sign panels, arrows, room numbers, one bold exhibit-like portrait or name plaque, strong negative space',
+    palette: ['deep green, pink, black, and cream', 'red, yellow, black, and off-white', 'blue, cream, and signal red'],
+    typography: ['blocky signage type', 'museum label captions', 'numbered room codes'],
+    identity: 'For avatar mode, make the avatar a printed exhibit portrait. For username mode, make the name a room label and punchline-like title.',
+  },
+  {
+    id: 'xerox-photo-silhouette',
+    mode: 'avatar',
+    tone: 'paper',
+    concept: 'photocopied club-night portrait poster, but redrawn as graphic print rather than photo collage',
+    layout: 'large monochrome face or bust in the center, rough crop marks, handwritten lineup fragments, broad empty paper areas',
+    palette: ['black ink on dirty cream with one red accent', 'blue paper with black ink and white scratches', 'salmon paper with black and cyan ink'],
+    typography: ['photocopy captions', 'small handwritten schedule notes', 'cropped title stamp'],
+    identity: 'Use avatar mode only: turn the avatar into a rough xerox performer portrait with recognizable hair, posture, and expression energy.',
+  },
+];
+
+function seedScore(seed: string) {
+  return Array.from(seed).reduce((score, char) => ((score << 5) - score + char.charCodeAt(0)) >>> 0, 2166136261);
 }
 
-const avatarPrompt = avatarPromptFor();
-const basicPrompt = basicPromptFor();
+function pickForSeed<T>(items: T[], seed: string, salt: string): T {
+  return items[seedScore(`${seed}:${salt}`) % items.length];
+}
 
-function toneForSeed(seed: string): PosterTone {
-  const tones: PosterTone[] = ['neon', 'paper', 'acid'];
-  const score = Array.from(seed).reduce((sum, char) => sum + char.charCodeAt(0), 0);
-  return tones[score % tones.length];
+function promptTemplateFor(mode: PosterPromptMode, seed: string) {
+  const pool = PROMPT_TEMPLATES.filter(template => template.mode === mode || template.mode === 'both');
+  return pickForSeed(pool, seed, mode);
+}
+
+function buildPosterPrompt(mode: PosterPromptMode, userName: string | undefined, seed: string) {
+  const template = promptTemplateFor(mode, seed);
+  const palette = pickForSeed(template.palette, seed, 'palette');
+  const type = pickForSeed(template.typography, seed, 'type');
+  const identityRule = mode === 'avatar' ? AVATAR_IDENTITY_RULE : USERNAME_IDENTITY_RULE;
+  const prompt = [
+    POSTER_PROMPT_BASE,
+    identityRule,
+    nameGraphicLine(userName),
+    `Template: ${template.concept}.`,
+    `Layout: ${template.layout}.`,
+    `Palette: ${palette}.`,
+    `Typography: ${type}.`,
+    template.identity,
+    'Keep the strongest identity mark in the center vertical safe area. Make this poster look different from other templates in composition, not only in color.',
+  ].join(' ');
+  return { prompt, posterTone: template.tone, templateId: template.id };
 }
 
 function makeId() {
@@ -112,16 +246,20 @@ function preloadImage(url: string): Promise<void> {
 }
 
 function demoPoster(index: number): PosterEntry {
+  const userName = ['Maya', 'Jun', 'Rae', 'Noor', 'Ari', 'Lux', 'Theo', 'Iris'][index % 8];
+  const mode = index % 3 === 0 ? 'basic' : 'avatar';
+  const promptSpec = buildPosterPrompt(mode === 'avatar' ? 'avatar' : 'username', userName, `demo-${index}`);
   return {
     id: `demo-poster-${index}`,
     createdAt: Date.now() - index * 90000,
-    mode: index % 3 === 0 ? 'basic' : 'avatar',
+    mode,
     imageUrl: REVIEW_POSTER_IMAGES[index % REVIEW_POSTER_IMAGES.length],
-    prompt: index % 3 === 0 ? basicPrompt : avatarPrompt,
-    hasAvatar: index % 3 !== 0,
-    posterTone: toneForSeed(`demo-${index}`),
+    prompt: promptSpec.prompt,
+    hasAvatar: mode === 'avatar',
+    posterTone: promptSpec.posterTone,
+    posterTemplate: promptSpec.templateId,
     userId: `demo-${index}`,
-    userName: ['Maya', 'Jun', 'Rae', 'Noor', 'Ari', 'Lux', 'Theo', 'Iris'][index % 8],
+    userName,
   };
 }
 
@@ -420,12 +558,11 @@ export function usePosterWall() {
     setGenerationPhase('art');
     setError('');
     const hasAvatar = !!profile?.head_url;
-    const prompt = hasAvatar ? avatarPromptFor(profile?.name) : basicPromptFor(profile?.name);
     const draftId = makeId();
     const draftCreatedAt = Date.now();
-    const posterTone = toneForSeed(`${draftId}-${draftCreatedAt}`);
+    const promptSpec = buildPosterPrompt(hasAvatar ? 'avatar' : 'username', profile?.name, `${draftId}-${draftCreatedAt}`);
     try {
-      const imageUrl = await gen.generate({ prompt, ...(hasAvatar ? { ref_url: profile!.head_url! } : {}) });
+      const imageUrl = await gen.generate({ prompt: promptSpec.prompt, ...(hasAvatar ? { ref_url: profile!.head_url! } : {}) });
       setGenerationPhase('saving');
       await preloadImage(imageUrl);
       const now = Date.now();
@@ -434,9 +571,10 @@ export function usePosterWall() {
         createdAt: now,
         mode: hasAvatar ? 'avatar' : 'basic',
         imageUrl,
-        prompt,
+        prompt: promptSpec.prompt,
         hasAvatar,
-        posterTone,
+        posterTone: promptSpec.posterTone,
+        posterTemplate: promptSpec.templateId,
         userId: telegramId || 'self',
         userName: profile?.name,
         userAvatarUrl: profile?.head_url,
