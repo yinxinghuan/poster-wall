@@ -111,6 +111,7 @@ function DetailSocial({
 
   const latestComments = comments.slice(-3).reverse();
   const locale = 'en-US';
+  const authorName = entry.userName || (entry.isSelf ? t('self') : 'artist');
 
   return (
     <section className="pw-detail__social">
@@ -126,7 +127,7 @@ function DetailSocial({
             </span>
             <span className="pw-author-card__name">
               <small>{entry.hasAvatar ? t('avatarBadge') : t('noAvatarBadge')}</small>
-              <strong>{entry.userName || t('self')}</strong>
+              <strong>{authorName}</strong>
             </span>
           </div>
         ) : (
@@ -146,15 +147,10 @@ function DetailSocial({
             </span>
             <span className="pw-author-card__name">
               <small>{entry.hasAvatar ? t('avatarBadge') : t('noAvatarBadge')}</small>
-              <strong>{entry.userName || 'artist'}</strong>
+              <strong>{authorName}</strong>
             </span>
           </button>
         )}
-
-        <div className="pw-social__metrics" aria-label={`${t('likeCount', { n: likes.length })}, ${t('commentCount', { n: comments.length })}`}>
-          <span>{likes.length}</span>
-          <span>{comments.length}</span>
-        </div>
       </div>
 
       <div className="pw-social__actions">
@@ -165,9 +161,9 @@ function DetailSocial({
           aria-pressed={liked}
         >
           <span aria-hidden>{liked ? '♥' : '♡'}</span>
-          {liked ? t('liked') : t('like')}
+          {likes.length > 0 ? likes.length : t('like')}
         </button>
-        <span>{t('comments')}</span>
+        <span className="pw-social__note-count">{t('commentCount', { n: comments.length })}</span>
       </div>
 
       <div className="pw-comments">
@@ -206,7 +202,7 @@ function DetailSocial({
           value={draft}
           onChange={ev => setDraft(ev.target.value)}
           maxLength={140}
-          placeholder={t('commentPlaceholder')}
+          placeholder={t('commentPlaceholder', { n: authorName })}
         />
         <button type="submit" disabled={!draft.trim()}>{t('sendComment')}</button>
       </form>

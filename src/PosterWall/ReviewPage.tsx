@@ -88,13 +88,13 @@ export default function ReviewPage() {
           <span className="pwr-kicker">Flat poster system</span>
           <h1>Posters lead. Signage guides.</h1>
           <p>
-            This version drops the realistic wall. A venue-signage UI frames a stack of loud graphic posters,
-            then lets the same posters animate into a clean grid for browsing.
+            The wall has two real reading modes: a compressed one-screen stack for drama, and a quiet
+            scrollable grid for browsing. The UI stays restrained so the poster work can be loud.
           </p>
           <div className="pwr-legend">
-            <span>Cut-corner signs</span>
+            <span>One-screen stack</span>
             <span>English only</span>
-            <span>Stack / Grid motion</span>
+            <span>Animated Stack / Grid</span>
             <span>Flat poster prompts</span>
           </div>
           <div className="pwr-links">
@@ -112,10 +112,10 @@ export default function ReviewPage() {
       <section className="pwr-detail-review">
         <div>
           <span className="pwr-kicker">Final detail</span>
-          <h2>The detail page stays quiet.</h2>
+          <h2>Social actions stop shouting.</h2>
           <p>
-            The complete poster owns the page. Author, likes, and notes sit below as a clear information band,
-            without tape, tickets, or wall texture.
+            The poster owns the page. Likes and notes sit in one compact band: heart plus count, notes count,
+            author identity, and a direct input that names who receives the note.
           </p>
           <div className="pwr-name-samples">
             {names.map(name => <span key={name}>{name}</span>)}
@@ -131,7 +131,7 @@ export default function ReviewPage() {
               <small>Avatar poster</small>
               <strong>goldie_with_a_very_long_name</strong>
             </div>
-            <em>♥ 8</em>
+            <em>♥ 8 · 2 notes</em>
           </footer>
         </div>
       </section>

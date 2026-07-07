@@ -35,7 +35,7 @@ const en = {
   liked: 'Liked',
   comments: 'Notes',
   noComments: 'No notes yet. Leave the first mark.',
-  commentPlaceholder: 'Leave a note for this poster',
+  commentPlaceholder: 'Leave a note for {n}',
   sendComment: 'Send',
   commentCount: '{n} notes',
   likeCount: '{n} likes',
