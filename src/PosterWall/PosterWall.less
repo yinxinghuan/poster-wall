@@ -1,12 +1,19 @@
-@bg: #050505;
-@fg: #f4f0e8;
-@muted: rgba(244, 240, 232, 0.56);
-@line: rgba(244, 240, 232, 0.16);
-@soft: rgba(244, 240, 232, 0.08);
-@ink: #050505;
-@accent: #f4f0e8;
-@danger: #ff4d5f;
+@bg: #151515;
+@fg: #eee7d5;
+@muted: rgba(238, 231, 213, 0.6);
+@line: rgba(238, 231, 213, 0.18);
+@soft: rgba(238, 231, 213, 0.08);
+@ink: #151515;
+@yellow: #ffe100;
+@blue: #2457e6;
+@red: #f31313;
+@cream: #eee7d5;
+@green: #17664b;
+@cyan: #4dcfe8;
+@accent: @yellow;
+@danger: @red;
 @ease: cubic-bezier(0.2, 0.9, 0.18, 1);
+@cut: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px));
 
 .pw-shell {
   width: 100%;
@@ -24,7 +31,7 @@
   transform-origin: top center;
   color: @fg;
   background:
-    radial-gradient(circle at 50% 0%, rgba(244, 240, 232, 0.06), transparent 34%),
+    radial-gradient(circle at 50% 0%, rgba(255, 225, 0, 0.08), transparent 34%),
     @bg;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
@@ -35,7 +42,7 @@
   position: absolute;
   left: 22px;
   right: 22px;
-  top: 18px;
+  top: 16px;
   z-index: 40;
   display: flex;
   align-items: flex-start;
@@ -45,58 +52,71 @@
 
 .pw-header__copy {
   min-width: 0;
+  width: 184px;
+  min-height: 78px;
+  padding: 8px 12px 10px;
+  background: @yellow;
+  color: @ink;
+  clip-path: @cut;
+  box-shadow: 0 12px 0 rgba(0,0,0,0.28);
 
   p {
-    margin: 5px 0 0;
-    color: @muted;
-    font-size: 11px;
-    font-weight: 700;
+    margin: 3px 0 0;
+    color: @ink;
+    font-size: 10px;
+    font-weight: 1000;
     line-height: 1.2;
   }
 }
 
 .pw-kicker {
   display: block;
-  color: @muted;
-  font-size: 10px;
-  font-weight: 900;
-  letter-spacing: 0.16em;
+  color: @red;
+  font-size: 9px;
+  font-weight: 1000;
+  letter-spacing: 0.08em;
 }
 
 .pw-header h1 {
-  margin: 2px 0 0;
-  color: @fg;
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 24px;
+  margin: 0;
+  color: @red;
+  font-family: Impact, Haettenschweiler, 'Arial Black', Inter, sans-serif;
+  font-size: 42px;
   font-weight: 1000;
-  line-height: 1;
+  line-height: 0.9;
   letter-spacing: 0;
 }
 
 .pw-view-toggle {
   flex: 0 0 auto;
-  width: 124px;
-  height: 36px;
-  padding: 3px;
+  width: 130px;
+  height: 78px;
+  padding: 0;
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  border: 1px solid @line;
-  background: rgba(255,255,255,0.02);
+  grid-template-rows: 1fr 1fr;
+  gap: 8px;
+  border: 0;
+  background: transparent;
 
   button {
     min-width: 0;
     border: 0;
     border-radius: 0;
-    background: transparent;
-    color: @muted;
-    font-size: 12px;
-    font-weight: 900;
+    background: @cream;
+    color: @blue;
+    clip-path: @cut;
+    font-family: Impact, Haettenschweiler, 'Arial Black', Inter, sans-serif;
+    font-size: 23px;
+    font-weight: 1000;
+    line-height: 1;
     cursor: pointer;
+    transition: background 180ms ease, color 180ms ease, transform 180ms ease;
   }
 
   .is-active {
-    background: @fg;
-    color: @ink;
+    background: @blue;
+    color: @cream;
+    transform: translateX(-5px);
   }
 }
 
@@ -104,8 +124,8 @@
   position: absolute;
   left: 0;
   right: 0;
-  top: 78px;
-  bottom: 132px;
+  top: 112px;
+  bottom: 142px;
   z-index: 10;
   overflow-x: hidden;
   overflow-y: hidden;
@@ -288,11 +308,11 @@
   position: absolute;
   left: 22px;
   right: 22px;
-  bottom: 20px;
+  bottom: 18px;
   z-index: 50;
-  min-height: 96px;
-  padding-top: 13px;
-  border-top: 1px solid @line;
+  min-height: 108px;
+  padding-top: 0;
+  border-top: 0;
   color: @fg;
   background: rgba(5,5,5,0.72);
   backdrop-filter: blur(10px);
@@ -302,13 +322,17 @@
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 10px;
+  min-height: 42px;
+  padding: 0 0 8px;
 
   strong {
     display: block;
-    color: @fg;
-    font-size: 11px;
-    font-weight: 900;
+    color: @cyan;
+    font-size: 10px;
+    font-weight: 1000;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
   }
 
   p {
@@ -329,9 +353,9 @@
   justify-content: center;
   overflow: hidden;
   border-radius: 50%;
-  border: 1px solid @line;
-  background: @soft;
-  color: @fg;
+  border: 2px solid @cream;
+  background: @green;
+  color: @cream;
   font-weight: 900;
 
   img {
@@ -357,7 +381,7 @@
     flex: 1;
     height: 3px;
     overflow: hidden;
-    background: @line;
+    background: rgba(238,231,213,0.2);
   }
 
   span::after {
@@ -365,7 +389,7 @@
     position: absolute;
     inset: 0;
     width: 36%;
-    background: @fg;
+    background: @yellow;
     animation: pw-progress-slide 1.3s ease-in-out infinite;
   }
 
@@ -395,15 +419,17 @@
 .pw-cta {
   position: relative;
   width: 100%;
-  min-height: 48px;
+  min-height: 54px;
   margin-top: 8px;
   border: 0;
   border-radius: 0;
-  padding: 8px 46px 8px 14px;
-  color: @ink;
+  padding: 7px 54px 8px 16px;
+  color: @red;
   text-align: left;
   overflow: hidden;
   background: @accent;
+  clip-path: polygon(0 0, calc(100% - 28px) 0, 100% 28px, 100% 100%, 28px 100%, 0 calc(100% - 28px));
+  box-shadow: 0 12px 0 rgba(0,0,0,0.28);
   cursor: pointer;
   touch-action: manipulation;
 
@@ -415,15 +441,19 @@
 
 .pw-cta__mark {
   display: block;
-  font-size: 15px;
+  font-family: Impact, Haettenschweiler, 'Arial Black', Inter, sans-serif;
+  font-size: 27px;
   font-weight: 1000;
+  line-height: 0.95;
 }
 
 .pw-cta__copy {
   display: block;
   margin-top: 2px;
+  color: @ink;
   font-size: 10px;
-  font-weight: 750;
+  font-weight: 1000;
+  text-transform: uppercase;
   line-height: 1.25;
 }
 
@@ -432,18 +462,22 @@
   right: 14px;
   top: 50%;
   transform: translateY(-50%);
-  color: @ink;
-  font-size: 22px;
+  color: @red;
+  font-size: 28px;
   font-weight: 900;
 }
 
 .pw-cta--cooldown {
-  border: 1px solid @line;
-  background: transparent;
-  color: @fg;
+  border: 0;
+  background: @green;
+  color: @cream;
 
   .pw-cta__arrow {
-    color: @fg;
+    color: @cream;
+  }
+
+  .pw-cta__copy {
+    color: @cream;
   }
 }
 
@@ -455,12 +489,14 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background: @bg;
+  background:
+    radial-gradient(circle at 70% 12%, rgba(36,87,230,0.18), transparent 28%),
+    @bg;
 }
 
 .pw-production__top {
   span {
-    color: @muted;
+    color: @yellow;
     font-size: 10px;
     font-weight: 1000;
     letter-spacing: 0.18em;
@@ -471,7 +507,8 @@
     display: block;
     margin-top: 10px;
     color: @fg;
-    font-size: 30px;
+    font-family: Impact, Haettenschweiler, 'Arial Black', Inter, sans-serif;
+    font-size: 42px;
     font-weight: 1000;
     line-height: 1;
   }
@@ -500,7 +537,8 @@
   height: 262px;
   overflow: hidden;
   background:
-    linear-gradient(135deg, #ff3d5a 0 26%, #89d9ea 26% 52%, #f9e939 52% 76%, #a471ff 76%);
+    linear-gradient(135deg, @red 0 30%, @cyan 30% 60%, @yellow 60%);
+  clip-path: @cut;
   box-shadow: 0 28px 70px rgba(0,0,0,0.52);
   transform: rotate(-2deg);
 }
@@ -558,12 +596,14 @@
 
 .pw-production__cue {
   min-height: 96px;
-  padding: 14px 0 0;
-  border-top: 1px solid @line;
+  padding: 14px;
+  background: @blue;
+  color: @cream;
+  clip-path: @cut;
 
   span {
     display: block;
-    color: @muted;
+    color: @cream;
     font-size: 10px;
     font-weight: 1000;
     letter-spacing: 0.18em;
@@ -572,7 +612,7 @@
   strong {
     display: block;
     margin-top: 7px;
-    color: @fg;
+    color: @cream;
     font-size: 14px;
     line-height: 1.35;
   }
@@ -587,24 +627,24 @@
     width: 7px;
     height: 7px;
     border-radius: 50%;
-    background: @line;
+    background: rgba(238,231,213,0.32);
   }
 
   .is-active,
   .is-done {
-    background: @fg;
+    background: @yellow;
   }
 }
 
 .pw-production__meter {
   height: 4px;
   overflow: hidden;
-  background: @line;
+  background: rgba(238,231,213,0.2);
 
   span {
     display: block;
     height: 100%;
-    background: @fg;
+    background: @yellow;
     transition: width 500ms ease;
   }
 }
@@ -628,14 +668,15 @@
   justify-self: start;
   align-self: center;
   height: 32px;
-  border: 1px solid @line;
+  border: 0;
   border-radius: 0;
   padding: 0 12px;
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  background: transparent;
-  color: @fg;
+  background: @red;
+  color: @cream;
+  clip-path: @cut;
   font-size: 12px;
   font-weight: 850;
   cursor: pointer;
@@ -788,7 +829,7 @@
 }
 
 .pw-like--active {
-  background: @fg;
+  background: @yellow;
   color: @ink;
 }
 
@@ -886,7 +927,7 @@
     height: 38px;
     border: 0;
     border-radius: 0;
-    background: @fg;
+    background: @yellow;
     color: @ink;
     font-size: 13px;
     font-weight: 900;

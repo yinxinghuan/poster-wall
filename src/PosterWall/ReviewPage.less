@@ -1,9 +1,15 @@
-@bg: #050505;
-@fg: #f4f0e8;
-@muted: rgba(244, 240, 232, 0.58);
-@line: rgba(244, 240, 232, 0.16);
-@panel: rgba(244, 240, 232, 0.06);
-@ink: #050505;
+@bg: #151515;
+@fg: #eee7d5;
+@muted: rgba(238, 231, 213, 0.62);
+@line: rgba(238, 231, 213, 0.18);
+@panel: rgba(238, 231, 213, 0.06);
+@ink: #151515;
+@yellow: #ffe100;
+@blue: #2457e6;
+@red: #f31313;
+@green: #17664b;
+@cyan: #4dcfe8;
+@cut: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 24px 100%, 0 calc(100% - 24px));
 
 .pwr-page {
   min-height: 100vh;
@@ -30,11 +36,15 @@
 }
 
 .pwr-kicker {
-  color: @muted;
+  display: inline-flex;
+  padding: 8px 12px;
+  color: @yellow;
+  border: 1px solid @line;
   font-size: 12px;
   font-weight: 1000;
   letter-spacing: 0.18em;
   text-transform: uppercase;
+  clip-path: @cut;
 }
 
 .pwr-copy h1,
@@ -77,6 +87,7 @@
 .pwr-name-samples span,
 .pwr-links a {
   border: 1px solid @line;
+  clip-path: @cut;
   padding: 10px 14px;
   background: transparent;
   color: @fg;
@@ -86,7 +97,8 @@
 }
 
 .pwr-links a:first-child {
-  background: @fg;
+  border-color: transparent;
+  background: @yellow;
   color: @ink;
 }
 
@@ -100,14 +112,14 @@
   position: relative;
   height: 680px;
   overflow: hidden;
-  border: 1px solid @line;
+  border: 0;
   background: @bg;
 
   header {
     position: absolute;
-    left: 22px;
-    right: 22px;
-    top: 18px;
+    left: 18px;
+    right: 18px;
+    top: 16px;
     z-index: 20;
     display: flex;
     justify-content: space-between;
@@ -117,7 +129,7 @@
   header span,
   header small {
     display: block;
-    color: @muted;
+    color: @ink;
     font-size: 10px;
     font-weight: 900;
     letter-spacing: 0.12em;
@@ -126,8 +138,9 @@
   header strong {
     display: block;
     margin-top: 2px;
-    color: @fg;
-    font-size: 24px;
+    color: @red;
+    font-family: Impact, Haettenschweiler, 'Arial Black', Inter, sans-serif;
+    font-size: 42px;
     font-weight: 1000;
     line-height: 1;
   }
@@ -138,18 +151,28 @@
     font-size: 11px;
   }
 
+  header > div {
+    width: 182px;
+    min-height: 76px;
+    padding: 8px 12px;
+    background: @yellow;
+    clip-path: @cut;
+  }
+
   header em {
     flex: 0 0 auto;
-    height: 32px;
-    min-width: 54px;
+    height: 54px;
+    min-width: 82px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid @line;
-    background: @fg;
-    color: @ink;
+    border: 0;
+    background: @blue;
+    color: @fg;
+    clip-path: @cut;
     font-style: normal;
-    font-size: 12px;
+    font-family: Impact, Haettenschweiler, 'Arial Black', Inter, sans-serif;
+    font-size: 24px;
     font-weight: 900;
   }
 
@@ -176,12 +199,14 @@
   }
 
   footer button {
-    height: 42px;
+    height: 46px;
     border: 0;
-    background: @fg;
-    color: @ink;
-    font-size: 13px;
-    font-weight: 900;
+    background: @red;
+    color: @fg;
+    clip-path: @cut;
+    font-family: Impact, Haettenschweiler, 'Arial Black', Inter, sans-serif;
+    font-size: 24px;
+    font-weight: 1000;
   }
 }
 
@@ -260,10 +285,11 @@
   button {
     justify-self: start;
     height: 34px;
-    border: 1px solid @line;
+    border: 0;
     padding: 0 14px;
-    background: transparent;
+    background: @red;
     color: @fg;
+    clip-path: @cut;
     font-weight: 850;
   }
 
@@ -314,7 +340,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid @line;
+  border: 2px solid @fg;
+  background: @green;
   color: @fg;
   font-weight: 1000;
 }
@@ -399,7 +426,8 @@
   width: 160px;
   height: 230px;
   overflow: hidden;
-  background: linear-gradient(135deg, #ff3d5a 0 32%, #89d9ea 32% 62%, #f9e939 62%);
+  background: linear-gradient(135deg, @red 0 32%, @cyan 32% 62%, @yellow 62%);
+  clip-path: @cut;
 }
 
 .pwr-state__bar,

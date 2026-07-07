@@ -110,7 +110,7 @@ function DetailSocial({
   }
 
   const latestComments = comments.slice(-3).reverse();
-  const locale = navigator.language.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+  const locale = 'en-US';
 
   return (
     <section className="pw-detail__social">
@@ -308,7 +308,7 @@ export default function PosterWall() {
             </span>
             <div>
               <strong>{hasAvatar ? t('avatarBadge') : t('noAvatarBadge')}</strong>
-              <p>{hasAvatar ? '头像会被转译成统一演出海报，不会直接贴原头像。' : t('profileHint')}</p>
+              <p>{hasAvatar ? t('avatarReadyHint') : t('profileHint')}</p>
             </div>
           </div>
 

@@ -25,16 +25,16 @@ function ModePreview({ mode }: { mode: 'stack' | 'grid' }) {
         <div>
           <span>POSTER WALL</span>
           <strong>TONIGHT</strong>
-          <small>墙上 / 我的  12 / 4</small>
+          <small>WALL / MINE  12 / 4</small>
         </div>
-        <em>{mode === 'stack' ? '叠放' : '排列'}</em>
+        <em>{mode === 'stack' ? 'STACK' : 'GRID'}</em>
       </header>
       <div className="pwr-mode__deck" aria-hidden>
         {Array.from({ length: 10 }, (_, index) => <MiniPoster key={index} index={index} />)}
       </div>
       <footer>
-        <span>头像会被转译成海报图形</span>
-        <button>生成海报</button>
+        <span>Avatar traits become poster language</span>
+        <button>MAKE</button>
       </footer>
     </div>
   );
@@ -75,20 +75,20 @@ export default function ReviewPage() {
       <section className="pwr-hero">
         <div className="pwr-copy">
           <span className="pwr-kicker">Flat poster system</span>
-          <h1>让海报成为主视觉，界面退到背景里。</h1>
+          <h1>Posters lead. Signage guides.</h1>
           <p>
-            这一版不模拟真实墙面。纯色背景承载高饱和海报，作品墙在“凌乱叠放”和“整齐排列”之间动画切换；
-            UI 只保留标题、数量、视图切换、生成入口和社交信息。
+            This version drops the realistic wall. A venue-signage UI frames a stack of loud graphic posters,
+            then lets the same posters animate into a clean grid for browsing.
           </p>
           <div className="pwr-legend">
-            <span>纯色背景</span>
-            <span>干净矩形海报</span>
-            <span>布局切换动画</span>
-            <span>克制功能区</span>
+            <span>Cut-corner signs</span>
+            <span>English only</span>
+            <span>Stack / Grid motion</span>
+            <span>Flat poster prompts</span>
           </div>
           <div className="pwr-links">
-            <a href="?play=1">查看真实游戏空环境</a>
-            <a href="https://github.com/yinxinghuan/poster-wall/archive/refs/heads/master.zip">迁移工具 zip</a>
+            <a href="?play=1">Open live game view</a>
+            <a href="https://github.com/yinxinghuan/poster-wall/archive/refs/heads/master.zip">Migration zip</a>
           </div>
         </div>
 
@@ -101,9 +101,10 @@ export default function ReviewPage() {
       <section className="pwr-detail-review">
         <div>
           <span className="pwr-kicker">Final detail</span>
-          <h2>详情页也保持展陈感。</h2>
+          <h2>The detail page stays quiet.</h2>
           <p>
-            完整海报占主视觉，作者、点赞、留言放在下方信息区。没有胶带、票根、墙面纹理，让社交功能清楚但不抢戏。
+            The complete poster owns the page. Author, likes, and notes sit below as a clear information band,
+            without tape, tickets, or wall texture.
           </p>
           <div className="pwr-name-samples">
             {names.map(name => <span key={name}>{name}</span>)}
@@ -111,12 +112,12 @@ export default function ReviewPage() {
           </div>
         </div>
         <div className="pwr-detail-card">
-          <button type="button">← 返回</button>
+          <button type="button">← BACK</button>
           <MiniPoster index={4} />
           <footer>
             <span className="pwr-avatar">G</span>
             <div>
-              <small>头像高级演出海报</small>
+              <small>Avatar poster</small>
               <strong>goldie_with_a_very_long_name</strong>
             </div>
             <em>♥ 8</em>
@@ -127,9 +128,10 @@ export default function ReviewPage() {
       <section className="pwr-generated-review">
         <header>
           <span className="pwr-kicker">Poster direction</span>
-          <h2>生成图要更像平面设计海报。</h2>
+          <h2>Generated posters should feel designed.</h2>
           <p>
-            后续 prompt 会重点强化大色块、粗黑字、编号、日期、演出信息、极简图形符号，以及用户名作为字形装饰。
+            The prompt now pushes saturated color fields, huge condensed typography, cut-corner placards,
+            edition codes, dates, venue labels, arrows, and names as graphic material.
           </p>
         </header>
         <div className="pwr-generated-grid">
@@ -144,23 +146,23 @@ export default function ReviewPage() {
 
       <section className="pwr-states">
         <StateCard
-          title="01 / 有头像"
-          caption="头像只提供特征和气质，最后仍是一张原创平面海报。"
+          title="01 / Avatar"
+          caption="The avatar supplies traits and attitude. The result is still original poster art."
           mode="avatar"
         />
         <StateCard
-          title="02 / 无头像"
-          caption="仍可生成基础海报，同时提示建立头像获得更个人化结果。"
+          title="02 / No avatar"
+          caption="A basic poster can still be generated, with a prompt to create an avatar for a stronger result."
           mode="basic"
         />
         <StateCard
-          title="03 / 生成中"
-          caption="等待页简洁展示当前工序，隐藏图片生成和预载的空白时间。"
+          title="03 / Making"
+          caption="The waiting page stages the process while generation and image preload finish."
           mode="generating"
         />
         <StateCard
-          title="04 / 完成详情"
-          caption="完整海报、作者信息、喜欢和留言集中展示。"
+          title="04 / Detail"
+          caption="Full poster, author, likes, and notes are shown together."
           mode="detail"
         />
       </section>

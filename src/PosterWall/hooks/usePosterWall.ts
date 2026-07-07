@@ -44,31 +44,32 @@ function nameGraphicLine(userName?: string) {
   if (!clean) return 'If no usable user name is available, do not invent a name; use abstract poster typography instead.';
   return [
     `Optional user-name material: "${clean}".`,
-    'Treat the name as graphic raw material, not as a plain signature: artist alias fragments, initials, cropped block letters, vertical or sideways type, ticket numbers, venue codes, set-time labels, torn headline fragments, or half-readable decorative typography.',
-    'Keep name-derived typography near the center third of the poster so wall cropping still leaves traces visible.',
+    'Treat the name as graphic raw material, never as a plain signature: oversized cropped letters, initials, sideways type, venue arrows, edition numbers, access-code labels, show-title fragments, or half-readable decorative typography.',
+    'Keep name-derived typography in the center third of the poster so the stacked wall view still shows a recognizable trace.',
   ].join(' ');
 }
 
 function avatarPromptFor(userName?: string) {
   return [
-    'Full-bleed vertical underground live music gig poster artwork pasted-in-the-city in spirit, using the reference avatar only as raw identity inspiration.',
-    'Extract broad traits only: face silhouette, hairstyle direction, expression energy, color temperature, accessory hints, and attitude.',
-    'Reinvent those traits as an original club night poster, band tour poster, festival side-stage poster, experimental live show flyer, or underground venue bill.',
+    'Full-bleed vertical graphic event poster, clean flat design, inspired by venue wayfinding signs, comedy museum labels, backstage placards, fashion-week schedules, and bold European gig flyers.',
+    'Use the reference avatar only as raw identity inspiration. Extract broad traits only: face silhouette, hairstyle direction, expression energy, color temperature, accessory hints, and attitude.',
+    'Reinvent those traits as an original event identity poster: a club night poster, band tour placard, festival side-stage bill, experimental live show flyer, or backstage access graphic.',
     nameGraphicLine(userName),
-    'Use bold show-title hierarchy, venue/date blocks, fake lineup fragments, torn-paper collage, halftone dots, screenprint registration errors, ink scuffs, photocopy grain, tape residue, serial numbers, barcodes, and rough overprint texture.',
-    'The final artwork should feel like a second-generation gig poster interpretation of the person, not a pasted avatar and not a literal photo portrait.',
-    'Artwork fills the entire rectangular image edge to edge, with the strongest visual mass centered.',
+    'Visual language: saturated single-color or two-color background, huge condensed black or cream typography, cut-corner sign panels, arrows, numbers, edition codes, date/time blocks, short fake lineup fragments, clean grids, hard edges, strong negative space, minimal symbols.',
+    'The final artwork should feel like a second-generation graphic poster interpretation of the person, not a pasted avatar and not a literal photo portrait.',
+    'Artwork fills the entire rectangular image edge to edge, with the strongest visual mass centered. It should read clearly when stacked behind other posters.',
     'Do not preserve the exact face, do not copy the photo composition, do not paste a circular avatar, do not create a photorealistic headshot, do not make a cute caricature.',
-    'Do not include app UI, mockup frame, surrounding wall background, blank margins, standalone logo, skateboard, wheels, trucks, protest placards, wanted-poster cliches, or childish styling.',
+    'Do not include app UI, phone mockup, surrounding wall background, paper tape, torn edges, blank margins, standalone logo, skateboard, wheels, trucks, protest placards, wanted-poster cliches, or childish styling.',
   ].join(' ');
 }
 
 function basicPromptFor(userName?: string) {
   return [
-    'Full-bleed vertical underground live music gig poster artwork, raw two or three color screenprint, bold show-title fragments, fake lineup blocks, venue/date/time labels, ticket numbers, tape residue, torn paper, photocopy grain, halftone dots.',
+    'Full-bleed vertical graphic event poster, clean flat design, venue wayfinding sign language, bold typographic placard, high contrast, saturated color field.',
     nameGraphicLine(userName),
-    'The artwork fills the entire rectangular image edge to edge, strongest type and symbol composition centered, gritty urban paste-up wall energy around a club night or live show.',
-    'Do not include app UI, mockup frame, surrounding wall background, blank margins, portrait, skateboard, wheels, trucks, or readable external brand logos.',
+    'Use oversized condensed black or cream typography, cut-corner color blocks, arrows, edition numbers, date/time blocks, fake lineup fragments, venue labels, hard geometric composition, clean grids, minimal symbols, strong centered visual mass.',
+    'The artwork fills the entire rectangular image edge to edge. It must look like a designed poster, not a scene, not a wall mockup, not a UI screenshot.',
+    'Do not include app UI, phone mockup, surrounding wall background, paper tape, torn edges, blank margins, portrait, skateboard, wheels, trucks, or readable external brand logos.',
   ].join(' ');
 }
 
@@ -298,7 +299,7 @@ export function usePosterWall() {
         ['demo-poster-0', [{
           id: 'demo-message-0',
           target: 'demo-poster-0',
-          text: '这张像被贴在凌晨两点的后巷入口。',
+          text: 'This feels like the sign outside a midnight side stage.',
           ts: Date.now() - 1000 * 60 * 8,
           fromUserId: 'demo-note-0',
           userName: 'Noor',
