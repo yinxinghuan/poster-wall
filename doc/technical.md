@@ -3,15 +3,15 @@
 ## 1. 技术栈
 
 - React 18 + TypeScript + Vite，构建 `base: './'`，样式使用 Less。
-- 渲染方式是 DOM/CSS：三列海报墙、生成等待页、完整海报详情页和评审页都由 HTML/CSS 组成。
+- 渲染方式是 DOM/CSS：街头 mockup 海报墙、生成等待页、完整海报详情页和评审页都由 HTML/CSS 组成。
 - 平台能力使用 `@shared/runtime`：`callAigramAPI`、`openAigramProfile`、`useGenImage`、`useGameEvent`；存档使用 `@shared/save/useGameSave`。
 - 运行时图像生成使用平台 `useGenImage.generate()`：有头像时传 `ref_url` 做头像参考，无头像时只传文本 prompt 生成基础演出海报。
 
 ## 2. 目录结构
 
 - `src/App.tsx`：非 Aigram 环境默认显示评审页；`?play=1` 或 Aigram iframe 显示真实游戏。
-- `src/PosterWall/PosterWall.tsx`：真实游戏 UI，包含场馆门口演出牌、三列半遮挡街头演出海报墙、票根式制作入口、12 小时冷却状态、全屏印刷间等待页、单张完整海报详情页、点赞、留言和作者 profile 入口。
-- `src/PosterWall/PosterWall.less`：真实游戏的场馆门口背景、TONIGHT 演出牌、票根式 CTA、海报纸张、胶带、印刷间、详情页和社交区样式。
+- `src/PosterWall/PosterWall.tsx`：真实游戏 UI，包含街头海报 mockup 墙、中心主海报、背景海报碎片、贴纸式制作入口、12 小时冷却状态、全屏印刷间等待页、单张完整海报详情页、点赞、留言和作者 profile 入口。
+- `src/PosterWall/PosterWall.less`：真实游戏的混凝土墙面、涂鸦拼贴层、中心主海报、纸张高光、胶带、生成入口、印刷间、详情页和社交区样式。
 - `src/PosterWall/hooks/usePosterWall.ts`：用户资料、图像生成、本地 mirror 存档、12 小时生成冷却、公共墙拉取、点赞/留言聚合、留言通知、optimistic merge。
 - `src/PosterWall/types.ts`：`PosterEntry`、`PosterSave`、`WallEntry`、舞台尺寸和评审海报资产路径。
 - `src/PosterWall/ReviewPage.tsx` / `ReviewPage.less`：评审页，展示最终首屏、详情页、生成目标样张和关键状态。
@@ -30,8 +30,8 @@
 - 图片预载：`generatePoster()` 在 `useGenImage.generate()` 返回 URL 后进入 `saving` 阶段，调用 `preloadImage()` 用 `new Image()` 加载并在支持时调用 `image.decode()`；最长等待 16 秒。只有预载结束后才写入 mirror、`persist()` 并打开详情页，降低首次详情看到空白图片的概率。
 - 公共墙：`refreshWall()` 调 `/note/aigram/ai/game/get/data/list`，flatten 每个用户存档里的全部 `posters`，按 `createdAt` 倒序截取 24 个，不只取最新一张。同一次 rows 会传给 `messagesByTarget()` 和 `likesByTarget()`，按作品 id 聚合互动，再解析相关用户 profile，为作者、留言者和点赞者补 `name/head_url`。
 - optimistic merge：真实墙面渲染前把 `mine` 中云端还没同步的作品合并到 `wall` 前面，用 `entry.id` 去重，解决保存同步造成的短暂空窗。
-- 界面风格：`PosterWall.less` 使用钠灯琥珀 `#ffb12b`、红色入场章 `#e23d2e`、旧票纸 `#e7c47f`、湿柏油 `#090706/#17110d` 和出口绿 `#53c777`，避免沿用滑板游戏的黑底粉蓝渐变。顶部 `.pw-header__billboard` 是红色 TONIGHT 演出牌，右侧 `.pw-header__door` 是票根式个人计数；底部 `.pw-generator` 是有虚线分隔和半圆缺口的旧票根入口，`.pw-cta` 是红章按钮。
-- 作品墙布局：`PosterWall.less` 的 `.pw-wall` 使用 3 列布局，单张海报 116px × 174px，`grid-auto-rows: 84px`，下一行覆盖上一行约 51.7% 高度；奇数行右移 38px，墙内顶部用 sticky 告示条模拟场馆门口注意事项，卡片用左下偏移阴影表现层叠空间。
+- 界面风格：`PosterWall.less` 使用混凝土灰 `#b8ad96/#c8c1ae/#978c7b`、钠灯琥珀 `#ffb12b`、红色污痕 `#e23d2e`、青色涂鸦 `rgba(22,155,178,0.78)` 和旧票纸 `#e7c47f`。顶部 `.pw-header__storybar` 是小型墙贴，右侧 `.pw-header__door` 是 56px 个人数量票根；底部 `.pw-generator` 是半透明贴墙操作纸条，`.pw-cta` 是红章胶囊按钮。
+- 作品墙布局：`PosterWall.tsx` 将 `wall[0]` 作为 `.pw-card--featured` 中心主海报，尺寸 218px × 327px；`wall.slice(1, 15)` 作为 `.pw-wall__collage` 背景碎片。`PosterWall.less` 为 14 个 `.pw-card--slot-*` 固定街头贴纸位设置 left/right/top 和 -7deg 到 8deg 旋转，背景碎片尺寸 104px × 156px，形成真实 mockup 墙而不是规则网格。
 - 详情页：选中作品后渲染覆盖舞台的 `.pw-detail` 全屏状态，顶部 `返回墙面` 按钮关闭详情，点击海报本身也关闭。主体只展示 236px × 356px 完整海报，不显示“正面/反面”说明；详情背景改为湿街口暗墙，底部 `.pw-detail__social` 改为票根式社交面板，包含作者头像 + 名字、点赞/留言计数、点赞按钮、最近 3 条留言和 140 字输入框；长用户名使用 `min-width:0`、`text-overflow: ellipsis`、`white-space: nowrap` 防止撑破页面。
 - 社交互动：`toggleLike(entry)` 把 `PosterLike` 存在当前玩家自己的 `PosterSave.likes`，同一玩家对同一作品只保留 1 个赞，再次点击取消；聚合时用 `fromUserId` 去重。`sendComment(entry,text)` 用 `newMessage()` 生成 `GuestMessage`，通过 `appendMessage()` 写入当前玩家自己的 `PosterSave.messages`，留言上限 140 字，本地立即回显；给非本人作品留言时触发 `poster_wall_note` 通知作者，`refUrl` 会把相对图片转成绝对 URL。
 - 跨用户身份：公共墙会拉取作者的 `name/head_url`；详情作者 chip 和留言作者 chip 显示头像 + 名字。非本人作者在 Aigram 内点击时调用 `openAigramProfile(userId)`，滚动墙内作品打开详情使用 `onClick`。

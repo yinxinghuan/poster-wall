@@ -5,15 +5,16 @@
 @red: #e23d2e;
 @amber: #ffb12b;
 @green: #53c777;
+@concrete: #c8c1ae;
 
 .pwr-page {
   min-height: 100vh;
   padding: 28px;
-  color: @paper;
+  color: #f7edd6;
   background:
-    radial-gradient(circle at 20% 0%, rgba(255,177,43,0.17), transparent 32%),
-    radial-gradient(circle at 90% 40%, rgba(226,61,46,0.14), transparent 26%),
-    linear-gradient(180deg, #23170f, #050403);
+    radial-gradient(circle at 20% 0%, rgba(22,155,178,0.18), transparent 32%),
+    radial-gradient(circle at 92% 42%, rgba(255,177,43,0.15), transparent 28%),
+    linear-gradient(180deg, #16120e, #050403);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
@@ -34,7 +35,7 @@
 }
 
 .pwr-kicker {
-  color: @amber;
+  color: #ffe14f;
   font-size: 12px;
   font-weight: 1000;
   letter-spacing: 0.22em;
@@ -111,41 +112,53 @@
   overflow: hidden;
   border-radius: 0;
   background:
-    radial-gradient(circle at 18% 12%, rgba(255,177,43,0.24), transparent 28%),
-    radial-gradient(circle at 96% 46%, rgba(226,61,46,0.17), transparent 26%),
-    repeating-linear-gradient(0deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 42px),
-    linear-gradient(180deg, #2a1b12, #17110d 72%, #090706);
+    radial-gradient(circle at 18% 12%, rgba(255,177,43,0.22), transparent 25%),
+    radial-gradient(circle at 92% 45%, rgba(22,155,178,0.22), transparent 28%),
+    linear-gradient(90deg, rgba(255,255,255,0.16) 0 1px, transparent 1px 100%),
+    linear-gradient(180deg, #b9ad95 0%, @concrete 42%, #8d8272 100%);
+  background-size: auto, auto, 52px 100%, auto;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 70px -28px 100px -28px;
+    background:
+      linear-gradient(12deg, transparent 0 18%, rgba(255,132,18,0.86) 18.3% 22%, transparent 22.4% 100%),
+      linear-gradient(-8deg, transparent 0 68%, rgba(22,155,178,0.78) 68.3% 72%, transparent 72.3% 100%),
+      radial-gradient(circle at 14% 34%, rgba(255,255,255,0.7), transparent 8%),
+      radial-gradient(circle at 82% 56%, rgba(0,0,0,0.42), transparent 12%),
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.08) 0 1px, transparent 1px 9px);
+    opacity: 0.9;
+    transform: rotate(-1deg);
+  }
 
   header {
-    position: relative;
-    z-index: 4;
-    margin: 14px 14px 0;
-    padding: 10px 12px 12px;
-    border: 1px solid rgba(243,223,181,0.32);
-    background: linear-gradient(90deg, rgba(226,61,46,0.95), rgba(123,31,22,0.94));
+    position: absolute;
+    left: 18px;
+    top: 14px;
+    z-index: 8;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 8px;
+    padding: 7px 10px;
+    border: 1px solid rgba(9,7,6,0.14);
+    background: linear-gradient(180deg, rgba(255,248,220,0.88), rgba(224,204,159,0.86));
+    box-shadow: 0 8px 18px rgba(0,0,0,0.22);
+    transform: rotate(-1deg);
   }
 
   header span {
-    color: rgba(255,244,204,0.78);
-    font-size: 10px;
+    color: rgba(9,7,6,0.52);
+    font-size: 9px;
     font-weight: 1000;
   }
 
   header strong {
-    display: block;
-    margin-top: 4px;
+    display: inline-block;
+    color: @ink;
     font-family: Impact, Haettenschweiler, 'Arial Black', sans-serif;
-    font-size: 48px;
-    line-height: 0.84;
-    text-shadow: 2px 2px 0 #111, 5px 3px 0 rgba(255,177,43,0.46);
-  }
-
-  header small {
-    display: block;
-    margin-top: 6px;
-    color: rgba(255,244,204,0.76);
-    font-size: 10px;
-    line-height: 1.28;
+    font-size: 20px;
+    line-height: 1;
   }
 }
 
@@ -153,16 +166,13 @@
   --poster-w: 104px;
   --poster-h: 156px;
   position: absolute;
-  left: 0;
-  right: 0;
-  top: 140px;
-  bottom: 122px;
-  display: grid;
-  grid-template-columns: repeat(3, var(--poster-w));
-  grid-auto-rows: 78px;
-  justify-content: center;
+  left: -20px;
+  right: -20px;
+  top: 52px;
+  bottom: 102px;
+  z-index: 2;
+  display: block;
   overflow: hidden;
-  padding-top: 12px;
 }
 
 .pwr-poster {
@@ -186,6 +196,31 @@
 .pwr-poster--large {
   --poster-w: 214px;
   --poster-h: 322px;
+}
+
+.pwr-wall .pwr-poster,
+.pwr-final > .pwr-poster--large {
+  position: absolute;
+}
+
+.pwr-wall .pwr-poster:nth-child(1) { left: 16px; top: 48px; transform: rotate(-7deg); }
+.pwr-wall .pwr-poster:nth-child(2) { right: -10px; top: 42px; transform: rotate(5deg); }
+.pwr-wall .pwr-poster:nth-child(3) { left: 254px; top: 128px; transform: rotate(2deg); }
+.pwr-wall .pwr-poster:nth-child(4) { left: -16px; top: 188px; transform: rotate(8deg); }
+.pwr-wall .pwr-poster:nth-child(5) { right: 18px; top: 266px; transform: rotate(-6deg); }
+.pwr-wall .pwr-poster:nth-child(6) { left: 42px; top: 350px; transform: rotate(-3deg); }
+.pwr-wall .pwr-poster:nth-child(7) { right: -24px; top: 396px; transform: rotate(7deg); }
+.pwr-wall .pwr-poster:nth-child(8) { left: 172px; top: 426px; transform: rotate(-4deg); }
+.pwr-wall .pwr-poster:nth-child(9) { left: -8px; top: 486px; transform: rotate(3deg); }
+.pwr-wall .pwr-poster:nth-child(10) { right: 74px; top: 4px; transform: rotate(-2deg); }
+.pwr-wall .pwr-poster:nth-child(11) { left: 122px; top: 28px; transform: rotate(3deg); }
+.pwr-wall .pwr-poster:nth-child(12) { right: 4px; top: 522px; transform: rotate(-5deg); }
+
+.pwr-final > .pwr-poster--large {
+  left: 50%;
+  top: 136px;
+  z-index: 7;
+  transform: translateX(-50%) rotate(-1.2deg);
 }
 
 .pwr-poster__paper {
@@ -224,17 +259,17 @@
   position: absolute;
   left: 20px;
   right: 20px;
-  bottom: 20px;
-  z-index: 5;
+  bottom: 18px;
+  z-index: 10;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px;
-  border: 1px solid rgba(9,7,6,0.2);
-  border-radius: 3px;
-  padding: 12px 12px 12px 18px;
-  background: linear-gradient(180deg, #f0d597, @ticket 68%, #c9974b);
-  box-shadow: 0 16px 42px rgba(0,0,0,0.55);
+  border: 1px solid rgba(255,255,255,0.32);
+  border-radius: 18px;
+  padding: 12px;
+  background: linear-gradient(180deg, rgba(255,248,224,0.78), rgba(232,211,166,0.68));
+  box-shadow: 0 18px 44px rgba(0,0,0,0.42), inset 0 1px 0 rgba(255,255,255,0.42);
 
   span {
     color: @ink;
@@ -244,7 +279,7 @@
 
   button {
     border: 0;
-    border-radius: 3px;
+    border-radius: 999px;
     padding: 11px 14px;
     background: @red;
     color: #fff4cc;

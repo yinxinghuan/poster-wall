@@ -69,13 +69,15 @@ function PosterCard({
   entry,
   index,
   onOpen,
+  kind = 'scrap',
 }: {
   entry: WallEntry;
   index: number;
   onOpen: () => void;
+  kind?: 'scrap' | 'featured';
 }) {
   return (
-    <button type="button" className="pw-card" style={posterStyle(entry, index)} onClick={onOpen}>
+    <button type="button" className={`pw-card pw-card--${kind} pw-card--slot-${index % 14}`} style={posterStyle(entry, index)} onClick={onOpen}>
       <span className="pw-card__paper" />
       <span className="pw-card__tape pw-card__tape--a" />
       <span className="pw-card__tape pw-card__tape--b" />
@@ -225,6 +227,8 @@ export default function PosterWall() {
   const game = usePosterWall();
   const hasAvatar = !!game.profile?.head_url;
   const activeProductionStep = productionStep(game);
+  const featuredEntry = game.wall[0];
+  const backgroundEntries = game.wall.slice(1, 15);
 
   useEffect(() => {
     const onKey = (ev: KeyboardEvent) => {
@@ -270,10 +274,9 @@ export default function PosterWall() {
         }}
       >
         <header className="pw-header">
-          <div className="pw-header__billboard">
+          <div className="pw-header__storybar">
             <span className="pw-kicker">{t('visible')} {game.wall.length}</span>
             <h1>{t('title')}</h1>
-            <p>{t('subtitle')}</p>
           </div>
           <div className="pw-header__door" aria-label={`${t('mine')} ${game.mine.length}`}>
             <span>{t('door')}</span>
@@ -283,21 +286,28 @@ export default function PosterWall() {
         </header>
 
         <section className="pw-wall" aria-label={t('wall')}>
-          {game.wall.map((entry, index) => (
+          <div className="pw-wall__collage">
+            {backgroundEntries.map((entry, index) => (
+              <PosterCard
+                key={entry.id}
+                entry={entry}
+                index={index}
+                onOpen={() => openEntry(entry)}
+              />
+            ))}
+          </div>
+          {featuredEntry && (
             <PosterCard
-              key={entry.id}
-              entry={entry}
-              index={index}
-              onOpen={() => openEntry(entry)}
+              key={featuredEntry.id}
+              entry={featuredEntry}
+              index={0}
+              kind="featured"
+              onOpen={() => openEntry(featuredEntry)}
             />
-          ))}
+          )}
         </section>
 
         <section className={`pw-generator pw-generator--${game.status}`}>
-          <div className="pw-generator__stub" aria-hidden>
-            <span>{t('ticketStub')}</span>
-            <strong>{game.canCraft ? t('admitOne') : t('standby')}</strong>
-          </div>
           <div className="pw-generator__status">
             <span className={`pw-avatar ${hasAvatar ? 'pw-avatar--ready' : ''}`}>
               {hasAvatar ? <img src={game.profile!.head_url} alt="" draggable={false} /> : '?'}
@@ -323,7 +333,6 @@ export default function PosterWall() {
             onPointerDown={handleGenerate}
             disabled={game.generating || !game.profileLoaded || !game.canCraft}
           >
-            <span className="pw-cta__serial">{game.canCraft ? t('admitOne') : t('standby')}</span>
             <span className="pw-cta__mark">
               {game.generating ? t('generating') : game.canCraft ? t('craftCtaTitle') : t('craftCooldownTitle')}
             </span>

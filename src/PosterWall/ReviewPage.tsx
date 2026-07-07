@@ -91,11 +91,11 @@ export default function ReviewPage() {
             <header>
               <span>墙上 12</span>
               <strong>TONIGHT</strong>
-              <small>把头像转译成一张地下演出海报，贴到场馆门口。</small>
             </header>
             <WallPreview />
+            <MiniPoster index={0} large />
             <div className="pwr-final__bar">
-              <span>ADMIT ONE</span>
+              <span>头像会被转译成海报图形</span>
               <button>开印今晚海报</button>
             </div>
           </div>
