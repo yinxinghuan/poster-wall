@@ -1,10 +1,14 @@
 type Locale = 'zh' | 'en';
 
 const zh = {
-  title: 'Gig Wall',
-  subtitle: '生成一张演出海报，贴上公共墙。',
+  title: 'TONIGHT',
+  subtitle: '把头像转译成一张地下演出海报，贴到场馆门口。',
   visible: '墙上',
   mine: '我的',
+  door: 'DOOR',
+  admitOne: 'ADMIT ONE',
+  standby: 'STANDBY',
+  ticketStub: '票根',
   generating: '生成中',
   loading: '加载中',
   retry: '重试',
@@ -46,10 +50,14 @@ const zh = {
 };
 
 const en: typeof zh = {
-  title: 'Gig Wall',
-  subtitle: 'Generate a gig poster and paste it on the wall.',
+  title: 'TONIGHT',
+  subtitle: 'Turn your avatar into an underground gig poster and paste it at the venue door.',
   visible: 'Wall',
   mine: 'Mine',
+  door: 'DOOR',
+  admitOne: 'ADMIT ONE',
+  standby: 'STANDBY',
+  ticketStub: 'TICKET',
   generating: 'Generating',
   loading: 'Loading',
   retry: 'Retry',

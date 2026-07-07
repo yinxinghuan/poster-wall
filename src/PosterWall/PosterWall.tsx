@@ -58,6 +58,11 @@ function formatCooldown(ms: number) {
   return `${minutes}m ${String(total % 60).padStart(2, '0')}s`;
 }
 
+function isTypingTarget(target: EventTarget | null) {
+  if (!(target instanceof HTMLElement)) return false;
+  return target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
+}
+
 const productionStepKeys = ['stagePrep', 'stageSpray', 'stageSeal'] as const;
 
 function PosterCard({
@@ -223,6 +228,7 @@ export default function PosterWall() {
 
   useEffect(() => {
     const onKey = (ev: KeyboardEvent) => {
+      if (isTypingTarget(ev.target)) return;
       if (ev.key === 'Escape') {
         game.setSelected(null);
         return;
@@ -264,14 +270,17 @@ export default function PosterWall() {
         }}
       >
         <header className="pw-header">
-          <div>
+          <div className="pw-header__billboard">
             <span className="pw-kicker">{t('visible')} {game.wall.length}</span>
             <h1>{t('title')}</h1>
+            <p>{t('subtitle')}</p>
           </div>
-          <span className="pw-mine">{t('mine')} {game.mine.length}</span>
+          <div className="pw-header__door" aria-label={`${t('mine')} ${game.mine.length}`}>
+            <span>{t('door')}</span>
+            <strong>{game.mine.length}</strong>
+            <small>{t('mine')}</small>
+          </div>
         </header>
-
-        <p className="pw-subtitle">{t('subtitle')}</p>
 
         <section className="pw-wall" aria-label={t('wall')}>
           {game.wall.map((entry, index) => (
@@ -285,6 +294,10 @@ export default function PosterWall() {
         </section>
 
         <section className={`pw-generator pw-generator--${game.status}`}>
+          <div className="pw-generator__stub" aria-hidden>
+            <span>{t('ticketStub')}</span>
+            <strong>{game.canCraft ? t('admitOne') : t('standby')}</strong>
+          </div>
           <div className="pw-generator__status">
             <span className={`pw-avatar ${hasAvatar ? 'pw-avatar--ready' : ''}`}>
               {hasAvatar ? <img src={game.profile!.head_url} alt="" draggable={false} /> : '?'}
@@ -310,6 +323,7 @@ export default function PosterWall() {
             onPointerDown={handleGenerate}
             disabled={game.generating || !game.profileLoaded || !game.canCraft}
           >
+            <span className="pw-cta__serial">{game.canCraft ? t('admitOne') : t('standby')}</span>
             <span className="pw-cta__mark">
               {game.generating ? t('generating') : game.canCraft ? t('craftCtaTitle') : t('craftCooldownTitle')}
             </span>

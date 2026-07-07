@@ -69,8 +69,8 @@ export default function ReviewPage() {
     <main className="pwr-page">
       <section className="pwr-hero">
         <div className="pwr-copy">
-          <span className="pwr-kicker">Gig Wall review build</span>
-          <h1>公共墙是一组层叠演出海报，不是头像贴片。</h1>
+          <span className="pwr-kicker">Tonight wall review build</span>
+          <h1>界面要像场馆门口，不像另一个滑板墙。</h1>
           <p>
             有头像时，头像只作为图像生成参考，被转译成地下演出海报里的艺人气质、色彩、标题和排版；
             无头像也能生成基础演出海报。真实生成图应是满版矩形图，外层纸张、胶带、墙面阴影由游戏样式完成。
@@ -78,7 +78,7 @@ export default function ReviewPage() {
           <div className="pwr-legend">
             <span>头像 = 生成参考</span>
             <span>结果 = 满版海报图</span>
-            <span>墙面 = 三列瓦片式半遮挡</span>
+            <span>墙面 = 场馆外张贴层</span>
           </div>
           <div className="pwr-links">
             <a href="?play=1">查看真实游戏空环境</a>
@@ -90,13 +90,13 @@ export default function ReviewPage() {
           <div className="pwr-final">
             <header>
               <span>墙上 12</span>
-              <strong>GIG WALL</strong>
+              <strong>TONIGHT</strong>
+              <small>把头像转译成一张地下演出海报，贴到场馆门口。</small>
             </header>
-            <p>生成一张演出海报，贴上公共墙。</p>
             <WallPreview />
             <div className="pwr-final__bar">
-              <span>头像高级演出海报</span>
-              <button>进入印刷间</button>
+              <span>ADMIT ONE</span>
+              <button>开印今晚海报</button>
             </div>
           </div>
         </div>
