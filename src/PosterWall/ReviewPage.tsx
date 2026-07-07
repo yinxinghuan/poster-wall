@@ -4,6 +4,30 @@ import './ReviewPage.less';
 
 const names = ['Maya', 'Jun', 'Rae', 'Noor', 'Ari', 'Lux'];
 
+const candidates = [
+  {
+    id: 'gallery',
+    label: 'A',
+    title: 'Gallery Black',
+    caption: 'Quiet black-box frame. UI behaves like museum labels and lets the poster stack carry the drama.',
+    meta: 'Calmest / safest',
+  },
+  {
+    id: 'pass',
+    label: 'B',
+    title: 'Backstage Pass',
+    caption: 'A controlled ticket-and-pass language. Still has gig culture, but the frame stops competing with posters.',
+    meta: 'Most cultural',
+  },
+  {
+    id: 'signal',
+    label: 'C',
+    title: 'Night Signal',
+    caption: 'A low-light venue-console feel. Small cyan signals guide interaction without turning the UI into a poster.',
+    meta: 'Most digital',
+  },
+] as const;
+
 function posterStyle(index: number): CSSProperties {
   return {
     '--poster-img': `url(${new URL(REVIEW_POSTER_IMAGES[index % REVIEW_POSTER_IMAGES.length], document.baseURI).href})`,
@@ -15,6 +39,45 @@ function MiniPoster({ index }: { index: number }) {
     <span className={`pwr-poster pwr-poster--slot-${index % 10}`} style={posterStyle(index)}>
       <span />
     </span>
+  );
+}
+
+function CandidatePhone({ candidate }: { candidate: typeof candidates[number] }) {
+  return (
+    <article className={`pwr-candidate pwr-candidate--${candidate.id}`}>
+      <div className="pwr-candidate__phone">
+        <header className="pwr-candidate__top">
+          <div>
+            <span>POSTER WALL</span>
+            <strong>TONIGHT</strong>
+            <small>WALL / MINE 12 / 4</small>
+          </div>
+          <nav aria-hidden>
+            <b>STACK</b>
+            <b>GRID</b>
+          </nav>
+        </header>
+        <div className="pwr-candidate__deck" aria-hidden>
+          {Array.from({ length: 10 }, (_, index) => <MiniPoster key={index} index={index} />)}
+        </div>
+        <footer className="pwr-candidate__bottom">
+          <span className="pwr-candidate__avatar">?</span>
+          <div>
+            <strong>Basic poster</strong>
+            <small>Avatar traits become poster language</small>
+          </div>
+          <button type="button">Make</button>
+        </footer>
+      </div>
+      <div className="pwr-candidate__copy">
+        <span>{candidate.label}</span>
+        <div>
+          <strong>{candidate.title}</strong>
+          <small>{candidate.meta}</small>
+        </div>
+      </div>
+      <p>{candidate.caption}</p>
+    </article>
   );
 }
 
@@ -83,6 +146,20 @@ function StateCard({
 export default function ReviewPage() {
   return (
     <main className="pwr-page">
+      <section className="pwr-choice">
+        <div className="pwr-choice__intro">
+          <span className="pwr-kicker">UI directions</span>
+          <h1>Choose the frame, not the layout.</h1>
+          <p>
+            The poster wall layout stays the same. These three options only change how the surrounding interface
+            carries hierarchy, controls, and the generate action.
+          </p>
+        </div>
+        <div className="pwr-candidates">
+          {candidates.map(candidate => <CandidatePhone key={candidate.id} candidate={candidate} />)}
+        </div>
+      </section>
+
       <section className="pwr-hero">
         <div className="pwr-copy">
           <span className="pwr-kicker">Flat poster system</span>
