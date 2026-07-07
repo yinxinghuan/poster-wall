@@ -10,6 +10,8 @@
 @cream: #eee7d5;
 @green: #17664b;
 @cyan: #4dcfe8;
+@subwayBlue: #0039a6;
+@subwayWhite: #f6f4ef;
 @accent: @yellow;
 @danger: @red;
 @ease: cubic-bezier(0.2, 0.9, 0.18, 1);
@@ -30,8 +32,9 @@
   overflow: hidden;
   transform-origin: top center;
   color: @fg;
+  font-family: 'Helvetica Neue', Helvetica, Arial, -apple-system, BlinkMacSystemFont, sans-serif;
   background:
-    radial-gradient(circle at 50% 0%, rgba(255, 225, 0, 0.08), transparent 34%),
+    radial-gradient(circle at 50% 0%, rgba(0, 57, 166, 0.12), transparent 34%),
     @bg;
   -webkit-tap-highlight-color: transparent;
   user-select: none;
@@ -65,26 +68,44 @@
     margin: 3px 0 0;
     color: @muted;
     font-size: 9px;
-    font-weight: 850;
+    font-weight: 500;
     line-height: 1.2;
   }
 }
 
 .pw-kicker {
+  position: relative;
   display: block;
-  color: @yellow;
+  padding-left: 31px;
+  color: rgba(246,244,239,0.84);
   font-size: 9px;
-  font-weight: 1000;
-  letter-spacing: 0.12em;
+  font-weight: 700;
+  letter-spacing: 0;
+
+  &::before {
+    content: 'A';
+    position: absolute;
+    left: 0;
+    top: -7px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    color: #fff;
+    background: @subwayBlue;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 24px;
+  }
 }
 
 .pw-header h1 {
   margin: 0;
-  color: @fg;
-  font-family: Impact, Haettenschweiler, 'Arial Black', Inter, sans-serif;
-  font-size: 31px;
-  font-weight: 1000;
-  line-height: 0.92;
+  color: @subwayWhite;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 29px;
+  font-weight: 700;
+  line-height: 1;
   letter-spacing: 0;
 }
 
@@ -178,19 +199,18 @@
 
   strong {
     display: block;
-    font-family: Impact, Haettenschweiler, 'Arial Black', Inter, sans-serif;
-    font-size: 16px;
-    font-weight: 1000;
-    line-height: 0.9;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
   }
 
   small {
     display: none;
     margin-top: 0;
     font-size: 7px;
-    font-weight: 1000;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    font-weight: 500;
+    letter-spacing: 0;
   }
 }
 
@@ -408,16 +428,15 @@
     display: block;
     color: @cyan;
     font-size: 10px;
-    font-weight: 1000;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0;
   }
 
   p {
     margin: 2px 0 0;
     color: @muted;
     font-size: 10px;
-    font-weight: 650;
+    font-weight: 500;
     line-height: 1.35;
   }
 }
@@ -434,7 +453,7 @@
   border: 2px solid @cream;
   background: @green;
   color: @cream;
-  font-weight: 900;
+  font-weight: 700;
 
   img {
     width: 100%;
@@ -477,7 +496,7 @@
     min-width: 58px;
     color: @muted;
     font-size: 10px;
-    font-weight: 800;
+    font-weight: 600;
     text-align: right;
   }
 }
@@ -493,7 +512,7 @@
   margin: 0;
   color: @danger;
   font-size: 10px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .pw-cta {
@@ -504,11 +523,11 @@
   border: 0;
   border-radius: 0;
   padding: 7px 34px 7px 12px;
-  color: @red;
+  color: @ink;
   text-align: left;
   overflow: hidden;
-  background: @accent;
-  clip-path: polygon(0 0, calc(100% - 28px) 0, 100% 28px, 100% 100%, 28px 100%, 0 calc(100% - 28px));
+  background: @subwayWhite;
+  clip-path: none;
   box-shadow: 0 12px 0 rgba(0,0,0,0.28);
   cursor: pointer;
   touch-action: manipulation;
@@ -521,10 +540,10 @@
 
 .pw-cta__mark {
   display: block;
-  font-family: Impact, Haettenschweiler, 'Arial Black', Inter, sans-serif;
-  font-size: 20px;
-  font-weight: 1000;
-  line-height: 0.95;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
 }
 
 .pw-cta__copy {
@@ -532,8 +551,7 @@
   margin-top: 2px;
   color: @ink;
   font-size: 8px;
-  font-weight: 1000;
-  text-transform: uppercase;
+  font-weight: 500;
   line-height: 1.25;
 }
 
@@ -542,14 +560,14 @@
   right: 14px;
   top: 50%;
   transform: translateY(-50%);
-  color: @red;
+  color: @subwayBlue;
   font-size: 22px;
-  font-weight: 900;
+  font-weight: 700;
 }
 
 .pw-cta--cooldown {
   border: 0;
-  background: @green;
+  background: rgba(246,244,239,0.16);
   color: @cream;
 
   .pw-cta__arrow {
@@ -576,21 +594,20 @@
 
 .pw-production__top {
   span {
-    color: @yellow;
+    color: @subwayWhite;
     font-size: 10px;
-    font-weight: 1000;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 0;
   }
 
   strong {
     display: block;
     margin-top: 10px;
     color: @fg;
-    font-family: Impact, Haettenschweiler, 'Arial Black', Inter, sans-serif;
-    font-size: 42px;
-    font-weight: 1000;
-    line-height: 1;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 35px;
+    font-weight: 700;
+    line-height: 1.04;
   }
 
   p {
@@ -598,7 +615,7 @@
     max-width: 310px;
     color: @muted;
     font-size: 13px;
-    font-weight: 650;
+    font-weight: 500;
     line-height: 1.48;
   }
 }
@@ -685,8 +702,8 @@
     display: block;
     color: @cream;
     font-size: 10px;
-    font-weight: 1000;
-    letter-spacing: 0.18em;
+    font-weight: 700;
+    letter-spacing: 0;
   }
 
   strong {
@@ -754,11 +771,12 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  background: @red;
+  border: 1px solid @line;
+  background: transparent;
   color: @cream;
-  clip-path: @cut;
+  clip-path: none;
   font-size: 12px;
-  font-weight: 850;
+  font-weight: 700;
   cursor: pointer;
 }
 
@@ -832,7 +850,7 @@
   border: 1px solid @line;
   background: @soft;
   color: @fg;
-  font-weight: 900;
+  font-weight: 700;
 
   img {
     width: 100%;
@@ -849,7 +867,7 @@
     display: block;
     color: @muted;
     font-size: 9px;
-    font-weight: 850;
+    font-weight: 500;
   }
 
   strong {
@@ -859,7 +877,7 @@
     overflow: hidden;
     color: @fg;
     font-size: 20px;
-    font-weight: 1000;
+    font-weight: 700;
     line-height: 1.05;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -873,7 +891,7 @@
   align-items: center;
   color: @muted;
   font-size: 11px;
-  font-weight: 850;
+  font-weight: 500;
 }
 
 .pw-like {
@@ -886,7 +904,7 @@
   gap: 7px;
   background: transparent;
   color: @fg;
-  font-weight: 900;
+  font-weight: 700;
   cursor: pointer;
 }
 
@@ -915,7 +933,7 @@
   margin: 0;
   color: @muted;
   font-size: 11px;
-  font-weight: 650;
+  font-weight: 500;
 }
 
 .pw-comment {
@@ -958,7 +976,7 @@
     overflow: hidden;
     color: @fg;
     font-size: 11px;
-    font-weight: 900;
+    font-weight: 700;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -1000,7 +1018,7 @@
     background: @yellow;
     color: @ink;
     font-size: 13px;
-    font-weight: 900;
+    font-weight: 700;
     cursor: pointer;
 
     &:disabled {

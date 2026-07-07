@@ -168,7 +168,10 @@ function DetailSocial({
 
       <div className="pw-comments">
         {latestComments.length ? latestComments.map(message => {
-          const isMine = message.fromUserId === String(game.telegramId || 'self') || message.userName === 'YOU';
+          const isMine =
+            message.fromUserId === String(game.telegramId || 'self') ||
+            message.userName === 'YOU' ||
+            message.userName === 'You';
           const author = message.userName || (isMine ? t('self') : 'artist');
           return (
             <article className="pw-comment" key={message.id}>
@@ -262,7 +265,7 @@ export default function PosterWall() {
       >
         <header className="pw-header">
           <div className="pw-header__copy">
-            <span className="pw-kicker">POSTER WALL</span>
+            <span className="pw-kicker">Poster Wall</span>
             <h1>{t('title')}</h1>
             <p>{t('wallStats', { n: `${game.wall.length} / ${game.mine.length}` })}</p>
           </div>

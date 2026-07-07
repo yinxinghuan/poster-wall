@@ -3,15 +3,15 @@
 ## 1. 技术栈
 
 - React 18 + TypeScript + Vite，构建 `base: './'`，样式使用 Less。
-- 渲染方式是 DOM/CSS：英文单语场馆导视风海报展台、`STACK / GRID` 切换动画、生成等待页、完整海报详情页和评审页都由 HTML/CSS 组成。
+- 渲染方式是 DOM/CSS：英文单语 Helvetica 地铁导视风海报展台、Stack / Grid 切换动画、生成等待页、完整海报详情页和评审页都由 HTML/CSS 组成。
 - 平台能力使用 `@shared/runtime`：`callAigramAPI`、`openAigramProfile`、`useGenImage`、`useGameEvent`；存档使用 `@shared/save/useGameSave`。
 - 运行时图像生成使用平台 `useGenImage.generate()`：有头像时传 `ref_url` 做头像参考，无头像时只传文本 prompt 生成基础演出海报。
 
 ## 2. 目录结构
 
 - `src/App.tsx`：非 Aigram 环境默认显示评审页；`?play=1` 或 Aigram iframe 显示真实游戏。
-- `src/PosterWall/PosterWall.tsx`：真实游戏 UI，包含英文单语文案、导视色块标题、`STACK / GRID` 视图状态、同一批海报的布局切换、12 小时冷却状态、全屏生成等待页、单张完整海报详情页、点赞、留言和作者 profile 入口。
-- `src/PosterWall/PosterWall.less`：真实游戏的深黑背景、切角导视标牌、海报叠放布局、整齐排列布局、680ms 布局切换动画、色块生成入口、等待页、详情页和社交区样式。
+- `src/PosterWall/PosterWall.tsx`：真实游戏 UI，包含英文单语文案、Helvetica 导视标题、Stack / Grid 视图状态、同一批海报的布局切换、12 小时冷却状态、全屏生成等待页、单张完整海报详情页、点赞、留言和作者 profile 入口。
+- `src/PosterWall/PosterWall.less`：真实游戏的深黑背景、地铁路线圆点、Helvetica 导视排版、海报叠放布局、整齐排列布局、680ms 布局切换动画、生成入口、等待页、详情页和社交区样式。
 - `src/PosterWall/hooks/usePosterWall.ts`：用户资料、图像生成、本地 mirror 存档、12 小时生成冷却、公共墙拉取、点赞/留言聚合、留言通知、optimistic merge。
 - `src/PosterWall/types.ts`：`PosterEntry`、`PosterSave`、`WallEntry`、舞台尺寸和评审海报资产路径。
 - `src/PosterWall/ReviewPage.tsx` / `ReviewPage.less`：评审页，展示最终首屏、详情页、生成目标样张和关键状态。
@@ -30,9 +30,9 @@
 - 图片预载：`generatePoster()` 在 `useGenImage.generate()` 返回 URL 后进入 `saving` 阶段，调用 `preloadImage()` 用 `new Image()` 加载并在支持时调用 `image.decode()`；最长等待 16 秒。只有预载结束后才写入 mirror、`persist()` 并打开详情页，降低首次详情看到空白图片的概率。
 - 公共墙：`refreshWall()` 调 `/note/aigram/ai/game/get/data/list`，flatten 每个用户存档里的全部 `posters`，按 `createdAt` 倒序截取 24 个，不只取最新一张。同一次 rows 会传给 `messagesByTarget()` 和 `likesByTarget()`，按作品 id 聚合互动，再解析相关用户 profile，为作者、留言者和点赞者补 `name/head_url`。
 - optimistic merge：真实墙面渲染前把 `mine` 中云端还没同步的作品合并到 `wall` 前面，用 `entry.id` 去重，解决保存同步造成的短暂空窗。
-- 界面风格：`PosterWall.less` 使用深黑 `#151515`、奶白 `#eee7d5`、黄色 `#ffe100`、蓝色 `#2457e6`、红色 `#f31313`、深绿 `#17664b` 和青色 `#4dcfe8`。顶部 `.pw-header__copy` 改为透明文字锁定，右侧 `.pw-view-toggle` 是 168px × 46px 的简洁 `STACK / GRID` 切换条；`STACK` 带三张重叠矩形图标，`GRID` 带 2×2 网格图标，选中态为奶白底黑字。底部 `.pw-generator` 是 58px 起的悬浮操作条，左侧头像状态，右侧 138px 黄色切角 `.pw-cta`。
+- 界面风格：`PosterWall.less` 使用深黑 `#151515`、奶白 `#eee7d5`、路线蓝 `#0039a6`、奶白标牌 `#f6f4ef`，辅助保留黄色 `#ffe100`、红色 `#f31313`、深绿 `#17664b` 和青色 `#4dcfe8`。根舞台使用 `Helvetica Neue / Helvetica / Arial`；顶部 `.pw-kicker` 带 24px 蓝色路线圆点 `A`，标题是 29px Helvetica Bold `Tonight`；右侧 `.pw-view-toggle` 是 168px × 46px 的简洁 `Stack / Grid` 切换条，`Stack` 带三张重叠矩形图标，`Grid` 带 2×2 网格图标，选中态为奶白底黑字。底部 `.pw-generator` 是 58px 起的悬浮操作条，左侧头像状态，右侧 138px 奶白矩形 `.pw-cta`，主文案为 `Make poster`，箭头使用路线蓝。
 - 作品墙布局：`PosterWall.tsx` 用 `useState<'stack' | 'grid'>` 管理视图，首屏渲染 `game.wall.slice(0, 10)`。每张 `.pw-card--slot-*` 是同一个 DOM 元素，`.pw-wall--stack` 下用不同尺寸、位置、旋转和 z-index 压缩成一屏内的海报堆，重点展示层层叠加而不是完整铺开所有内容；`.pw-wall--grid` 下移动到 2 列、154px × 231px 的正常可滚动队列；`left/top/width/height/transform/filter` 以 680ms `cubic-bezier(0.2,0.9,0.18,1)` 过渡。
-- 详情页：选中作品后渲染覆盖舞台的 `.pw-detail` 全屏状态，顶部红色切角 `BACK` 按钮关闭详情，点击海报本身也关闭。主体展示 246px × 369px 完整海报，不显示“正面/反面”说明；详情背景继续使用深黑，底部 `.pw-detail__social` 是细线分隔的信息区，包含作者头像 + 名字、心形点赞按钮及内联计数、单个留言数文本、最近 3 条留言和 140 字输入框；输入框 placeholder 由 `commentPlaceholder` 接收作者名生成 `Leave a note for {n}`。长用户名使用 `min-width:0`、`text-overflow: ellipsis`、`white-space: nowrap` 防止撑破页面。
+- 详情页：选中作品后渲染覆盖舞台的 `.pw-detail` 全屏状态，顶部透明细线 `Back` 按钮关闭详情，点击海报本身也关闭。主体展示 246px × 369px 完整海报，不显示“正面/反面”说明；详情背景继续使用深黑，底部 `.pw-detail__social` 是细线分隔的信息区，包含作者头像 + 名字、心形点赞按钮及内联计数、单个留言数文本、最近 3 条留言和 140 字输入框；输入框 placeholder 由 `commentPlaceholder` 接收作者名生成 `Leave a note for {n}`。长用户名使用 `min-width:0`、`text-overflow: ellipsis`、`white-space: nowrap` 防止撑破页面。
 - 社交互动：`toggleLike(entry)` 把 `PosterLike` 存在当前玩家自己的 `PosterSave.likes`，同一玩家对同一作品只保留 1 个赞，再次点击取消；聚合时用 `fromUserId` 去重。`sendComment(entry,text)` 用 `newMessage()` 生成 `GuestMessage`，通过 `appendMessage()` 写入当前玩家自己的 `PosterSave.messages`，留言上限 140 字，本地立即回显；给非本人作品留言时触发 `poster_wall_note` 通知作者，`refUrl` 会把相对图片转成绝对 URL。
 - 跨用户身份：公共墙会拉取作者的 `name/head_url`；详情作者 chip 和留言作者 chip 显示头像 + 名字。非本人作者在 Aigram 内点击时调用 `openAigramProfile(userId)`，滚动墙内作品打开详情使用 `onClick`。
 - 响应式：真实游戏固定 `FIELD_W=390`、`FIELD_H=680`，根据 `visualViewport` 与 `#root` 实际尺寸计算 scale；`.pw-shell` 顶部对齐、`.pw-stage` 使用 `transform-origin: top center`，避免 mini App 外层导航栏压缩可用高度后游戏仍垂直居中造成顶部空隙。
