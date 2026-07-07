@@ -17,13 +17,8 @@ function asAssetUrl(url: string) {
 }
 
 function posterStyle(entry: WallEntry, index: number): CSSProperties {
-  const row = Math.floor(index / 3);
-  const col = index % 3;
-  const rotate = [-2.2, 1.4, -0.8, 1.8, -1.2, 0.6][index % 6];
   return {
-    '--x': `${row % 2 === 0 ? 0 : 38}px`,
-    '--z': `${20 + row * 10 + col}`,
-    '--rot': `${rotate}deg`,
+    '--z': `${30 - index}`,
     '--poster-img': `url(${asAssetUrl(entry.imageUrl)})`,
   } as CSSProperties;
 }
@@ -69,18 +64,14 @@ function PosterCard({
   entry,
   index,
   onOpen,
-  kind = 'scrap',
 }: {
   entry: WallEntry;
   index: number;
   onOpen: () => void;
-  kind?: 'scrap' | 'featured';
 }) {
   return (
-    <button type="button" className={`pw-card pw-card--${kind} pw-card--slot-${index % 14}`} style={posterStyle(entry, index)} onClick={onOpen}>
+    <button type="button" className={`pw-card pw-card--slot-${index % 10}`} style={posterStyle(entry, index)} onClick={onOpen}>
       <span className="pw-card__paper" />
-      <span className="pw-card__tape pw-card__tape--a" />
-      <span className="pw-card__tape pw-card__tape--b" />
     </button>
   );
 }
@@ -225,10 +216,10 @@ function DetailSocial({
 
 export default function PosterWall() {
   const game = usePosterWall();
+  const [viewMode, setViewMode] = useState<'stack' | 'grid'>('stack');
   const hasAvatar = !!game.profile?.head_url;
   const activeProductionStep = productionStep(game);
-  const featuredEntry = game.wall[0];
-  const backgroundEntries = game.wall.slice(1, 15);
+  const visibleEntries = game.wall.slice(0, 10);
 
   useEffect(() => {
     const onKey = (ev: KeyboardEvent) => {
@@ -264,7 +255,7 @@ export default function PosterWall() {
   }
 
   return (
-    <main className="pw-shell">
+    <main className={`pw-shell pw-shell--${viewMode}`}>
       <section
         className="pw-stage"
         style={{
@@ -274,20 +265,32 @@ export default function PosterWall() {
         }}
       >
         <header className="pw-header">
-          <div className="pw-header__storybar">
-            <span className="pw-kicker">{t('visible')} {game.wall.length}</span>
+          <div className="pw-header__copy">
+            <span className="pw-kicker">POSTER WALL</span>
             <h1>{t('title')}</h1>
+            <p>{t('wallStats', { n: `${game.wall.length} / ${game.mine.length}` })}</p>
           </div>
-          <div className="pw-header__door" aria-label={`${t('mine')} ${game.mine.length}`}>
-            <span>{t('door')}</span>
-            <strong>{game.mine.length}</strong>
-            <small>{t('mine')}</small>
+          <div className="pw-view-toggle" aria-label={t('viewMode')}>
+            <button
+              type="button"
+              className={viewMode === 'stack' ? 'is-active' : ''}
+              onClick={() => setViewMode('stack')}
+            >
+              {t('stackView')}
+            </button>
+            <button
+              type="button"
+              className={viewMode === 'grid' ? 'is-active' : ''}
+              onClick={() => setViewMode('grid')}
+            >
+              {t('gridView')}
+            </button>
           </div>
         </header>
 
-        <section className="pw-wall" aria-label={t('wall')}>
-          <div className="pw-wall__collage">
-            {backgroundEntries.map((entry, index) => (
+        <section className={`pw-wall pw-wall--${viewMode}`} aria-label={t('wall')}>
+          <div className="pw-wall__deck">
+            {visibleEntries.map((entry, index) => (
               <PosterCard
                 key={entry.id}
                 entry={entry}
@@ -296,15 +299,6 @@ export default function PosterWall() {
               />
             ))}
           </div>
-          {featuredEntry && (
-            <PosterCard
-              key={featuredEntry.id}
-              entry={featuredEntry}
-              index={0}
-              kind="featured"
-              onOpen={() => openEntry(featuredEntry)}
-            />
-          )}
         </section>
 
         <section className={`pw-generator pw-generator--${game.status}`}>
@@ -399,9 +393,6 @@ export default function PosterWall() {
                 aria-label={t('backToWall')}
               >
                 <span className="pw-detail__paper" />
-                <span className="pw-detail__tape pw-detail__tape--a" />
-                <span className="pw-detail__tape pw-detail__tape--b" />
-                <span className="pw-detail__tape pw-detail__tape--c" />
               </button>
               <DetailSocial game={game} entry={game.selected} />
             </div>

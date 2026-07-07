@@ -2,35 +2,40 @@ import type { CSSProperties } from 'react';
 import { REVIEW_POSTER_IMAGES } from './types';
 import './ReviewPage.less';
 
-const names = ['Maya', 'Jun', 'Rae', 'Noor', 'Ari', 'Lux', 'Theo', 'Iris', 'Sol'];
+const names = ['Maya', 'Jun', 'Rae', 'Noor', 'Ari', 'Lux'];
 
 function posterStyle(index: number): CSSProperties {
-  const row = Math.floor(index / 3);
-  const rotate = [-2, 1.4, -0.7, 1.8, -1.2, 0.6][index % 6];
   return {
-    '--x': `${row % 2 === 0 ? 0 : 36}px`,
-    '--z': `${20 + row * 10 + index}`,
-    '--rot': `${rotate}deg`,
     '--poster-img': `url(${new URL(REVIEW_POSTER_IMAGES[index % REVIEW_POSTER_IMAGES.length], document.baseURI).href})`,
   } as CSSProperties;
 }
 
-function MiniPoster({ index, large = false }: { index: number; large?: boolean }) {
+function MiniPoster({ index }: { index: number }) {
   return (
-    <span className={`pwr-poster ${large ? 'pwr-poster--large' : ''}`} style={posterStyle(index)}>
-      <span className="pwr-poster__paper" />
-      <span className="pwr-poster__tape pwr-poster__tape--a" />
-      <span className="pwr-poster__tape pwr-poster__tape--b" />
+    <span className={`pwr-poster pwr-poster--slot-${index % 10}`} style={posterStyle(index)}>
+      <span />
     </span>
   );
 }
 
-function WallPreview({ count = 12 }: { count?: number }) {
+function ModePreview({ mode }: { mode: 'stack' | 'grid' }) {
   return (
-    <div className="pwr-wall" aria-hidden>
-      {Array.from({ length: count }, (_, index) => (
-        <MiniPoster key={index} index={index} />
-      ))}
+    <div className={`pwr-mode pwr-mode--${mode}`}>
+      <header>
+        <div>
+          <span>POSTER WALL</span>
+          <strong>TONIGHT</strong>
+          <small>墙上 / 我的  12 / 4</small>
+        </div>
+        <em>{mode === 'stack' ? '叠放' : '排列'}</em>
+      </header>
+      <div className="pwr-mode__deck" aria-hidden>
+        {Array.from({ length: 10 }, (_, index) => <MiniPoster key={index} index={index} />)}
+      </div>
+      <footer>
+        <span>头像会被转译成海报图形</span>
+        <button>生成海报</button>
+      </footer>
     </div>
   );
 }
@@ -48,16 +53,16 @@ function StateCard({
     <section className={`pwr-state pwr-state--${mode}`}>
       <header>
         <span>{title}</span>
-        <strong>{mode === 'basic' ? 'BASIC' : mode === 'avatar' ? 'AVATAR' : mode === 'generating' ? 'PRINTING' : 'DETAIL'}</strong>
+        <strong>{mode === 'basic' ? 'BASIC' : mode === 'avatar' ? 'AVATAR' : mode === 'generating' ? 'PROCESS' : 'DETAIL'}</strong>
       </header>
       {mode === 'generating' ? (
         <div className="pwr-state__press">
-          <span className="pwr-state__roller" />
-          <span className="pwr-state__ink pwr-state__ink--one" />
-          <span className="pwr-state__ink pwr-state__ink--two" />
+          <span className="pwr-state__bar" />
+          <span className="pwr-state__block pwr-state__block--one" />
+          <span className="pwr-state__block pwr-state__block--two" />
         </div>
       ) : (
-        <MiniPoster index={mode === 'basic' ? 2 : mode === 'detail' ? 5 : 0} large />
+        <MiniPoster index={mode === 'basic' ? 2 : mode === 'detail' ? 5 : 0} />
       )}
       <p>{caption}</p>
     </section>
@@ -69,16 +74,17 @@ export default function ReviewPage() {
     <main className="pwr-page">
       <section className="pwr-hero">
         <div className="pwr-copy">
-          <span className="pwr-kicker">Tonight wall review build</span>
-          <h1>界面要像场馆门口，不像另一个滑板墙。</h1>
+          <span className="pwr-kicker">Flat poster system</span>
+          <h1>让海报成为主视觉，界面退到背景里。</h1>
           <p>
-            有头像时，头像只作为图像生成参考，被转译成地下演出海报里的艺人气质、色彩、标题和排版；
-            无头像也能生成基础演出海报。真实生成图应是满版矩形图，外层纸张、胶带、墙面阴影由游戏样式完成。
+            这一版不模拟真实墙面。纯色背景承载高饱和海报，作品墙在“凌乱叠放”和“整齐排列”之间动画切换；
+            UI 只保留标题、数量、视图切换、生成入口和社交信息。
           </p>
           <div className="pwr-legend">
-            <span>头像 = 生成参考</span>
-            <span>结果 = 满版海报图</span>
-            <span>墙面 = 场馆外张贴层</span>
+            <span>纯色背景</span>
+            <span>干净矩形海报</span>
+            <span>布局切换动画</span>
+            <span>克制功能区</span>
           </div>
           <div className="pwr-links">
             <a href="?play=1">查看真实游戏空环境</a>
@@ -86,40 +92,29 @@ export default function ReviewPage() {
           </div>
         </div>
 
-        <div className="pwr-phone" aria-label="Final game preview">
-          <div className="pwr-final">
-            <header>
-              <span>墙上 12</span>
-              <strong>TONIGHT</strong>
-            </header>
-            <WallPreview />
-            <MiniPoster index={0} large />
-            <div className="pwr-final__bar">
-              <span>头像会被转译成海报图形</span>
-              <button>开印今晚海报</button>
-            </div>
-          </div>
+        <div className="pwr-previews">
+          <ModePreview mode="stack" />
+          <ModePreview mode="grid" />
         </div>
       </section>
 
       <section className="pwr-detail-review">
         <div>
           <span className="pwr-kicker">Final detail</span>
-          <h2>详情页只看完整海报和社交信息。</h2>
+          <h2>详情页也保持展陈感。</h2>
           <p>
-            点击墙上海报进入全屏详情。图片本身可点击返回，作者头像和名字在底部展示；
-            喜欢、留言和长用户名折叠都在这个页面里处理。
+            完整海报占主视觉，作者、点赞、留言放在下方信息区。没有胶带、票根、墙面纹理，让社交功能清楚但不抢戏。
           </p>
           <div className="pwr-name-samples">
-            {names.slice(0, 4).map(name => <span key={name}>{name}</span>)}
+            {names.map(name => <span key={name}>{name}</span>)}
             <span>VeryLongPosterArtistName</span>
           </div>
         </div>
         <div className="pwr-detail-card">
-          <button type="button">← 返回墙面</button>
-          <MiniPoster index={4} large />
+          <button type="button">← 返回</button>
+          <MiniPoster index={4} />
           <footer>
-              <span className="pwr-avatar">G</span>
+            <span className="pwr-avatar">G</span>
             <div>
               <small>头像高级演出海报</small>
               <strong>goldie_with_a_very_long_name</strong>
@@ -131,11 +126,10 @@ export default function ReviewPage() {
 
       <section className="pwr-generated-review">
         <header>
-          <span className="pwr-kicker">Generation target</span>
-          <h2>生成接口产物应该是满版矩形演出海报。</h2>
+          <span className="pwr-kicker">Poster direction</span>
+          <h2>生成图要更像平面设计海报。</h2>
           <p>
-            不要在生图里画手机界面、墙面、外框、胶带或留白，也不要把它做成普通头像写真。游戏会把矩形图贴到纸张容器里，
-            所以主体要靠中间，边缘可以被轻微裁切。
+            后续 prompt 会重点强化大色块、粗黑字、编号、日期、演出信息、极简图形符号，以及用户名作为字形装饰。
           </p>
         </header>
         <div className="pwr-generated-grid">
@@ -151,22 +145,22 @@ export default function ReviewPage() {
       <section className="pwr-states">
         <StateCard
           title="01 / 有头像"
-          caption="点击生成时用头像作为 ref_url，生成个性更强的演出海报，不直接贴原图。"
+          caption="头像只提供特征和气质，最后仍是一张原创平面海报。"
           mode="avatar"
         />
         <StateCard
           title="02 / 无头像"
-          caption="仍可生成基础演出海报，同时提示建立头像可得到更好的效果。"
+          caption="仍可生成基础海报，同时提示建立头像获得更个人化结果。"
           mode="basic"
         />
         <StateCard
           title="03 / 生成中"
-          caption="独立全屏印刷间承载等待过程，文案分阶段出现，隐藏图片预载时间。"
+          caption="等待页简洁展示当前工序，隐藏图片生成和预载的空白时间。"
           mode="generating"
         />
         <StateCard
           title="04 / 完成详情"
-          caption="完整海报、作者信息、喜欢和留言集中展示，不做正反面注解。"
+          caption="完整海报、作者信息、喜欢和留言集中展示。"
           mode="detail"
         />
       </section>
