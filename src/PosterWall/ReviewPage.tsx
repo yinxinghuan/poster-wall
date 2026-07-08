@@ -6,7 +6,7 @@ const generatedSamples = [
   { src: './img/review-generated/avatar-hex.jpg', label: 'Avatar / zine' },
   { src: './img/review-generated/avatar-tokyo.jpg', label: 'Avatar / pulp flyer' },
   { src: './img/review-generated/avatar-swiss.jpg', label: 'Avatar / graphic mark' },
-  { src: './img/review-generated/name-maya.jpg', label: 'Name / type system' },
+  { src: './img/review-generated/username-flat-ref.jpg', label: 'Name / flat type system' },
 ];
 
 function posterStyle(index: number): CSSProperties {

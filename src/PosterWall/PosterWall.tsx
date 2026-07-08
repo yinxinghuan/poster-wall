@@ -76,6 +76,16 @@ function PosterCard({
   );
 }
 
+function EmptyWall() {
+  return (
+    <div className="pw-wall-empty">
+      <span>{t('emptyWallKicker')}</span>
+      <strong>{t('emptyWallTitle')}</strong>
+      <p>{t('emptyWallBody')}</p>
+    </div>
+  );
+}
+
 function CommentAvatar({ message }: { message: GuestMessage }) {
   return (
     <span className="pw-comment__avatar" aria-hidden>
@@ -306,14 +316,18 @@ export default function PosterWall() {
 
         <section className={`pw-wall pw-wall--${viewMode}`} aria-label={t('wall')}>
           <div className="pw-wall__deck">
-            {visibleEntries.map((entry, index) => (
-              <PosterCard
-                key={entry.id}
-                entry={entry}
-                index={index}
-                onOpen={() => openEntry(entry)}
-              />
-            ))}
+            {visibleEntries.length ? (
+              visibleEntries.map((entry, index) => (
+                <PosterCard
+                  key={entry.id}
+                  entry={entry}
+                  index={index}
+                  onOpen={() => openEntry(entry)}
+                />
+              ))
+            ) : (
+              <EmptyWall />
+            )}
           </div>
         </section>
 
@@ -367,10 +381,12 @@ export default function PosterWall() {
 
             <div className="pw-production__bench" aria-hidden>
               <div className="pw-production__sheet">
+                <span className="pw-production__label">POSTER WALL</span>
                 <span className="pw-production__ink pw-production__ink--one" />
                 <span className="pw-production__ink pw-production__ink--two" />
                 <span className="pw-production__ink pw-production__ink--three" />
                 <span className="pw-production__roller" />
+                <span className="pw-production__shine" />
                 <span className="pw-production__grain" />
               </div>
             </div>

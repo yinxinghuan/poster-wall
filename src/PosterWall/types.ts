@@ -61,7 +61,9 @@ export interface WallEntry extends PosterEntry {
   likedByMe?: boolean;
 }
 
-export const REVIEW_POSTER_IMAGES = Array.from(
-  { length: 12 },
-  (_, index) => `./img/review-posters/poster-${String(index).padStart(2, '0')}.svg`,
-);
+export const REVIEW_POSTER_IMAGES = [
+  './img/review-generated/avatar-hex.jpg',
+  './img/review-generated/avatar-tokyo.jpg',
+  './img/review-generated/avatar-swiss.jpg',
+  './img/review-generated/username-flat-ref.jpg',
+];

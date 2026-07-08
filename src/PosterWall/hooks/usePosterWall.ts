@@ -21,7 +21,6 @@ import {
 import {
   FIELD_H,
   FIELD_W,
-  REVIEW_POSTER_IMAGES,
   type PosterEntry,
   type PosterLike,
   type PosterSave,
@@ -36,6 +35,7 @@ const MAX_MINE = 12;
 const MAX_WALL = 24;
 const MAX_LIKES_STORED = 80;
 const CRAFT_COOLDOWN_MS = 12 * 60 * 60 * 1000;
+const USERNAME_FORMAT_REF = './img/style-ref/flat-poster-ref.png';
 
 const DEFAULT_SAVE: PosterSave = { posters: [], totalGenerated: 0 };
 
@@ -63,18 +63,16 @@ interface PosterPromptTemplate {
 }
 
 const POSTER_PROMPT_BASE = [
-  'Create one square flat 2D event-poster graphic composition.',
-  'The whole square canvas must be the artwork surface itself: typography, color blocks, portrait marks, symbols, and print texture placed directly on the canvas.',
-  'Do not depict a physical poster object. Do not show a sheet of paper, printed page, poster board, hanging print, framed print, photographed print, or mockup.',
-  'The output must be only the pure artwork, edge to edge. No outer frame, no inner frame, no border, no white mat, no paper edge, no taped corner, no sticker decoration around the poster, no hanging hardware, no drop shadow outside the artwork.',
-  'Do not show the poster photographed in any real-world environment. No wall, brick, tile, table, paper tape, frame, phone, hand, shadow outside the artwork, product mockup, poster mockup, or poster hanging scene.',
-  'No camera, no perspective view, no realistic lighting, no 3D depth, no physical materials. The square must not contain a smaller rectangular poster sheet inside it.',
-  'The image will be center-cropped into a 2:3 vertical card, so keep the main face, name lettering, title mass, symbols, and strongest composition inside the center vertical safe area.',
-  'Extend color, print grain, secondary marks, and texture all the way to every edge.',
-  'Use fictional venue and show text only. Text may be hand-lettered, fragmented, cropped, semi-readable, or imperfect, as long as the design feels intentional.',
-  'This must feel like mature designed print culture: gig flyer, showbill, zine poster, venue placard, or indie event poster.',
-  'Do not create app UI, social-media story UI, blank margin, external brand logo, skateboard, wheels, trucks, wanted poster, childish cartoon, or generic digital poster.',
-  'If any border-like shape appears, it must be part of internal typography or artwork only, never an outer frame around the poster.',
+  'FORMAT CONTRACT: output exactly one flat 2D poster artwork image. The entire image canvas IS the poster artwork.',
+  'The result must look like a direct digital print file or scanned flat graphic, not like a photo of a poster.',
+  'Fill the image from edge to edge with artwork: ink fields, type, symbols, portrait marks, print grain, registration texture, and color blocks.',
+  'ABSOLUTELY FORBIDDEN: room, wall, brick, tile, table, floor, hand, phone, camera, frame, mat board, binder clip, tape, sticker outside the design, hanging hardware, photographed paper, product mockup, poster mockup, realistic lighting, perspective view, drop shadow outside the artwork, blank margin, white border, black border, outer frame, inner frame, smaller poster inside a larger scene.',
+  'Do not generate any real-world environment. Do not show a poster object. Do not show a sheet of paper. Do not show a framed print. Do not show the artwork being photographed.',
+  'If the model is tempted to add a border, replace it with full-bleed background color and internal typography instead.',
+  'Keep all important identity marks, face cues, title mass, name-derived typography, and symbols in the center vertical safe area because the UI crops the image into a 2:3 poster card.',
+  'Use fictional English venue and show text only. Text can be fragmented, cropped, hand-lettered, semi-readable, or imperfect, but it must be part of the poster design.',
+  'Make it feel like mature print culture: gig flyer, showbill, zine poster, venue placard, indie event poster, Swiss programme, or risograph screenprint.',
+  'No app UI, no social-media story UI, no QR code, no external brand logo, no Aigram logo, no Chinese sticker marks, no skateboard, no wheels, no wanted-poster trope, no childish cartoon.',
 ].join(' ');
 
 const AVATAR_IDENTITY_RULE = [
@@ -86,7 +84,9 @@ const AVATAR_IDENTITY_RULE = [
 
 const USERNAME_IDENTITY_RULE = [
   'There is no avatar. Use the user name as the social identity source.',
+  'A flat poster reference may be supplied only to lock the output format and typography hierarchy: full-bleed 2D poster artwork with visible event text, no photographed scene. Do not copy its exact text, colors, layout, or symbols.',
   'Turn the name into the main 2D graphic: large cropped letters, initials, vertical fragments, ticket-code typography, venue stamp, hand-lettered stage name, or half-readable title mass.',
+  'Generate your own fictional English show title, room label, date, time, edition number, and small venue notes as part of the poster.',
   'The name should feel integrated into the design, not placed as a plain signature.',
   'All lettering must sit directly on the flat design canvas, never on a photographed sheet, wall, signboard, or framed object.',
 ].join(' ');
@@ -225,6 +225,12 @@ function absoluteImageUrl(url: string) {
   return url.startsWith('http') ? url : new URL(url, document.baseURI).href;
 }
 
+function formatReferenceUrl() {
+  const url = absoluteImageUrl(USERNAME_FORMAT_REF);
+  if (/^https?:\/\/(localhost|127\.0\.0\.1)(:|\/)/.test(url)) return undefined;
+  return url;
+}
+
 function preloadImage(url: string): Promise<void> {
   return new Promise(resolve => {
     const image = new Image();
@@ -243,32 +249,6 @@ function preloadImage(url: string): Promise<void> {
     image.onerror = finish;
     image.src = absoluteImageUrl(url);
   });
-}
-
-function demoPoster(index: number): PosterEntry {
-  const userName = ['Maya', 'Jun', 'Rae', 'Noor', 'Ari', 'Lux', 'Theo', 'Iris'][index % 8];
-  const mode = index % 3 === 0 ? 'basic' : 'avatar';
-  const promptSpec = buildPosterPrompt(mode === 'avatar' ? 'avatar' : 'username', userName, `demo-${index}`);
-  return {
-    id: `demo-poster-${index}`,
-    createdAt: Date.now() - index * 90000,
-    mode,
-    imageUrl: REVIEW_POSTER_IMAGES[index % REVIEW_POSTER_IMAGES.length],
-    prompt: promptSpec.prompt,
-    hasAvatar: mode === 'avatar',
-    posterTone: promptSpec.posterTone,
-    posterTemplate: promptSpec.templateId,
-    userId: `demo-${index}`,
-    userName,
-  };
-}
-
-function makeDemoWall(): WallEntry[] {
-  return Array.from({ length: 12 }, (_, index) => ({
-    ...demoPoster(index),
-    userId: `demo-${index}`,
-    userName: ['Maya', 'Jun', 'Rae', 'Noor', 'Ari', 'Lux', 'Theo', 'Iris'][index % 8],
-  }));
 }
 
 async function fetchProfile(userId: string): Promise<ProfileInfo | null> {
@@ -431,24 +411,9 @@ export function usePosterWall() {
 
   const refreshWall = useCallback(async () => {
     if (!isInAigram) {
-      const demo = makeDemoWall().map((entry, index) => ({ ...entry, likeCount: 5 + index, commentCount: index % 3 }));
-      setWall(demo);
-      setMessageThreads(new Map([
-        ['demo-poster-0', [{
-          id: 'demo-message-0',
-          target: 'demo-poster-0',
-          text: 'This feels like the sign outside a midnight side stage.',
-          ts: Date.now() - 1000 * 60 * 8,
-          fromUserId: 'demo-note-0',
-          userName: 'Noor',
-        }]],
-      ]));
-      setLikeThreads(new Map([
-        ['demo-poster-0', [
-          { id: 'demo-like-0', target: 'demo-poster-0', ts: Date.now() - 1000 * 60 * 5, fromUserId: 'demo-note-1', userName: 'Maya' },
-          { id: 'demo-like-1', target: 'demo-poster-0', ts: Date.now() - 1000 * 60 * 15, fromUserId: 'demo-note-2', userName: 'Jun' },
-        ]],
-      ]));
+      setWall([]);
+      setMessageThreads(new Map());
+      setLikeThreads(new Map());
       return;
     }
     try {
@@ -527,7 +492,7 @@ export function usePosterWall() {
       .map(poster => ({
         ...poster,
         userId: 'self',
-        userName: 'YOU',
+        userName: 'You',
         userAvatarUrl: profile?.head_url,
         isSelf: true,
         likeCount: uniqueLikesFor(poster.id, likeThreads, mirror?.likes, myUserId).length,
@@ -562,7 +527,8 @@ export function usePosterWall() {
     const draftCreatedAt = Date.now();
     const promptSpec = buildPosterPrompt(hasAvatar ? 'avatar' : 'username', profile?.name, `${draftId}-${draftCreatedAt}`);
     try {
-      const imageUrl = await gen.generate({ prompt: promptSpec.prompt, ...(hasAvatar ? { ref_url: profile!.head_url! } : {}) });
+      const refUrl = hasAvatar ? profile!.head_url! : formatReferenceUrl();
+      const imageUrl = await gen.generate({ prompt: promptSpec.prompt, ...(refUrl ? { ref_url: refUrl } : {}) });
       setGenerationPhase('saving');
       await preloadImage(imageUrl);
       const now = Date.now();
@@ -603,14 +569,14 @@ export function usePosterWall() {
   const commentsFor = useCallback((entry: WallEntry | null): GuestMessage[] => {
     if (!entry) return [];
     return threadFor(entry.id, messageThreads, mirror?.messages, myUserId).map(message => (
-      message.fromUserId === myUserId ? { ...message, userName: 'YOU', userAvatarUrl: profile?.head_url } : message
+      message.fromUserId === myUserId ? { ...message, userName: 'You', userAvatarUrl: profile?.head_url } : message
     ));
   }, [messageThreads, mirror?.messages, myUserId, profile?.head_url]);
 
   const likesFor = useCallback((entry: WallEntry | null): PosterLike[] => {
     if (!entry) return [];
     return uniqueLikesFor(entry.id, likeThreads, mirror?.likes, myUserId).map(like => (
-      like.fromUserId === myUserId ? { ...like, userName: 'YOU', userAvatarUrl: profile?.head_url } : like
+      like.fromUserId === myUserId ? { ...like, userName: 'You', userAvatarUrl: profile?.head_url } : like
     ));
   }, [likeThreads, mirror?.likes, myUserId, profile?.head_url]);
 
