@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="768" height="1152" viewBox="0 0 768 1152">
+  <rect width="768" height="1152" fill="#ff5a35"/>
+  <g fill="#111111">
+    <circle cx="62" cy="54" r="10"/>
+    <circle cx="104" cy="54" r="10"/>
+    <rect x="146" y="45" width="58" height="18"/>
+    <circle cx="636" cy="54" r="10"/>
+    <circle cx="690" cy="54" r="10"/>
+    <text x="46" y="178" font-family="Arial Black, Helvetica, Arial, sans-serif" font-size="126" font-weight="900" letter-spacing="-8">NOTICE</text>
+    <rect x="46" y="230" width="320" height="292"/>
+    <g transform="translate(78 270)">
+      <circle cx="118" cy="112" r="78" fill="#ff5a35"/>
+      <path d="M42 162c38-56 103-72 158-34 19 14 34 35 42 63H42z"/>
+      <path d="M70 101c15-58 85-90 137-52 19 14 29 37 24 63-29-18-55-26-79-24-26 2-54 17-82 13z"/>
+      <circle cx="102" cy="108" r="9"/>
+      <circle cx="170" cy="108" r="9"/>
+      <rect x="100" y="147" width="72" height="10"/>
+    </g>
+    <text x="46" y="600" font-family="Courier New, monospace" font-size="44" font-style="italic">Meeting at room five</text>
+    <text x="46" y="660" font-family="Helvetica, Arial, sans-serif" font-size="35" font-weight="700">with local performers</text>
+    <text x="46" y="725" font-family="Helvetica, Arial, sans-serif" font-size="33" font-weight="700">Friday 22 / 22:00</text>
+    <text x="46" y="776" font-family="Helvetica, Arial, sans-serif" font-size="29" font-weight="700">Free entry / Side A</text>
+    <rect x="46" y="840" width="118" height="12"/>
+    <rect x="204" y="840" width="326" height="12"/>
+    <text x="46" y="902" font-family="Helvetica, Arial, sans-serif" font-size="18">Small catalog notes and edition codes align here.</text>
+    <text x="46" y="932" font-family="Helvetica, Arial, sans-serif" font-size="18">One ink only. One paper color only. No gradients.</text>
+    <circle cx="48" cy="1030" r="9"/>
+    <circle cx="48" cy="1076" r="9"/>
+    <rect x="650" y="1032" width="54" height="54"/>
+    <rect x="566" y="1032" width="56" height="12"/>
+    <text x="564" y="1110" font-family="Helvetica, Arial, sans-serif" font-size="15" font-weight="700">ED.07</text>
+  </g>
+</svg>

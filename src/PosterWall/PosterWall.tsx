@@ -24,19 +24,22 @@ function posterStyle(entry: WallEntry, index: number): CSSProperties {
 }
 
 function productionStep(game: ReturnType<typeof usePosterWall>) {
-  if (game.generationPhase === 'saving') return 2;
-  return game.elapsedMs < 35000 ? 0 : 1;
+  if (game.generationPhase === 'reading') return 0;
+  if (game.generationPhase === 'saving') return 3;
+  return game.elapsedMs < 35000 ? 1 : 2;
 }
 
 function productionProgress(game: ReturnType<typeof usePosterWall>) {
   const sec = game.elapsedMs / 1000;
   const step = productionStep(game);
-  if (step === 0) return Math.min(18 + (sec / 35) * 18, 36);
-  if (step === 1) return Math.min(42 + ((sec - 35) / 85) * 34, 76);
+  if (step === 0) return Math.min(8 + sec * 4, 22);
+  if (step === 1) return Math.min(24 + (sec / 35) * 20, 44);
+  if (step === 2) return Math.min(48 + ((sec - 35) / 85) * 30, 78);
   return 92;
 }
 
 function productionCopyKey(game: ReturnType<typeof usePosterWall>, hasAvatar: boolean) {
+  if (game.generationPhase === 'reading' && hasAvatar) return 'productionReadAvatar';
   if (game.generationPhase === 'saving') return 'productionSaving';
   return hasAvatar ? 'productionArtAvatar' : 'productionArtBasic';
 }
@@ -58,7 +61,7 @@ function isTypingTarget(target: EventTarget | null) {
   return target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
 }
 
-const productionStepKeys = ['stagePrep', 'stageSpray', 'stageSeal'] as const;
+const productionStepKeys = ['stageRead', 'stagePrep', 'stageSpray', 'stageSeal'] as const;
 
 function PosterCard({
   entry,
@@ -125,100 +128,104 @@ function DetailSocial({
 
   return (
     <section className="pw-detail__social">
-      <div className="pw-detail__identity">
-        {entry.isSelf ? (
-          <div className="pw-author-card pw-author-card--self">
-            <span className="pw-author-card__avatar" aria-hidden>
-              {entry.userAvatarUrl ? (
-                <img src={entry.userAvatarUrl} alt="" draggable={false} />
-              ) : (
-                <span>{authorInitial(entry.userName || t('self'))}</span>
-              )}
-            </span>
-            <span className="pw-author-card__name">
-              <small>{entry.hasAvatar ? t('avatarBadge') : t('noAvatarBadge')}</small>
-              <strong>{authorName}</strong>
-            </span>
-          </div>
-        ) : (
+      <div className="pw-detail__side">
+        <div className="pw-detail__identity">
+          {entry.isSelf ? (
+            <div className="pw-author-card pw-author-card--self">
+              <span className="pw-author-card__avatar" aria-hidden>
+                {entry.userAvatarUrl ? (
+                  <img src={entry.userAvatarUrl} alt="" draggable={false} />
+                ) : (
+                  <span>{authorInitial(entry.userName || t('self'))}</span>
+                )}
+              </span>
+              <span className="pw-author-card__name">
+                <small>{entry.hasAvatar ? t('avatarBadge') : t('noAvatarBadge')}</small>
+                <strong>{authorName}</strong>
+              </span>
+            </div>
+          ) : (
+            <button
+              type="button"
+              className="pw-author-card"
+              onClick={() => game.openAuthor(entry)}
+              disabled={!game.isInAigram}
+              aria-label={t('openProfile', { n: entry.userName || 'artist' })}
+            >
+              <span className="pw-author-card__avatar" aria-hidden>
+                {entry.userAvatarUrl ? (
+                  <img src={entry.userAvatarUrl} alt="" draggable={false} />
+                ) : (
+                  <span>{authorInitial(entry.userName)}</span>
+                )}
+              </span>
+              <span className="pw-author-card__name">
+                <small>{entry.hasAvatar ? t('avatarBadge') : t('noAvatarBadge')}</small>
+                <strong>{authorName}</strong>
+              </span>
+            </button>
+          )}
+        </div>
+
+        <div className="pw-social__actions">
           <button
             type="button"
-            className="pw-author-card"
-            onClick={() => game.openAuthor(entry)}
-            disabled={!game.isInAigram}
-            aria-label={t('openProfile', { n: entry.userName || 'artist' })}
+            className={`pw-like ${liked ? 'pw-like--active' : ''}`}
+            onClick={() => game.toggleLike(entry)}
+            aria-pressed={liked}
           >
-            <span className="pw-author-card__avatar" aria-hidden>
-              {entry.userAvatarUrl ? (
-                <img src={entry.userAvatarUrl} alt="" draggable={false} />
-              ) : (
-                <span>{authorInitial(entry.userName)}</span>
-              )}
-            </span>
-            <span className="pw-author-card__name">
-              <small>{entry.hasAvatar ? t('avatarBadge') : t('noAvatarBadge')}</small>
-              <strong>{authorName}</strong>
-            </span>
+            <span aria-hidden>{liked ? '♥' : '♡'}</span>
+            {likes.length > 0 ? likes.length : t('like')}
           </button>
-        )}
+          <span className="pw-social__note-count">{t('commentCount', { n: comments.length })}</span>
+        </div>
       </div>
 
-      <div className="pw-social__actions">
-        <button
-          type="button"
-          className={`pw-like ${liked ? 'pw-like--active' : ''}`}
-          onClick={() => game.toggleLike(entry)}
-          aria-pressed={liked}
-        >
-          <span aria-hidden>{liked ? '♥' : '♡'}</span>
-          {likes.length > 0 ? likes.length : t('like')}
-        </button>
-        <span className="pw-social__note-count">{t('commentCount', { n: comments.length })}</span>
-      </div>
+      <div className="pw-detail__notes">
+        <div className="pw-comments">
+          {latestComments.length ? latestComments.map(message => {
+            const isMine =
+              message.fromUserId === String(game.telegramId || 'self') ||
+              message.userName === 'YOU' ||
+              message.userName === 'You';
+            const author = message.userName || (isMine ? t('self') : 'artist');
+            return (
+              <article className="pw-comment" key={message.id}>
+                {isMine ? (
+                  <div className="pw-comment__author pw-comment__author--self">
+                    <CommentAvatar message={message} />
+                    <strong>{t('self')}</strong>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    className="pw-comment__author"
+                    onClick={() => game.openUserProfile(message.fromUserId)}
+                    disabled={!game.isInAigram}
+                  >
+                    <CommentAvatar message={message} />
+                    <strong>{author}</strong>
+                  </button>
+                )}
+                <p>{message.text}</p>
+                <time>{timeAgo(message.ts, locale)}</time>
+              </article>
+            );
+          }) : (
+            <p className="pw-comments__empty">{t('noComments')}</p>
+          )}
+        </div>
 
-      <div className="pw-comments">
-        {latestComments.length ? latestComments.map(message => {
-          const isMine =
-            message.fromUserId === String(game.telegramId || 'self') ||
-            message.userName === 'YOU' ||
-            message.userName === 'You';
-          const author = message.userName || (isMine ? t('self') : 'artist');
-          return (
-            <article className="pw-comment" key={message.id}>
-              {isMine ? (
-                <div className="pw-comment__author pw-comment__author--self">
-                  <CommentAvatar message={message} />
-                  <strong>{t('self')}</strong>
-                </div>
-              ) : (
-                <button
-                  type="button"
-                  className="pw-comment__author"
-                  onClick={() => game.openUserProfile(message.fromUserId)}
-                  disabled={!game.isInAigram}
-                >
-                  <CommentAvatar message={message} />
-                  <strong>{author}</strong>
-                </button>
-              )}
-              <p>{message.text}</p>
-              <time>{timeAgo(message.ts, locale)}</time>
-            </article>
-          );
-        }) : (
-          <p className="pw-comments__empty">{t('noComments')}</p>
-        )}
+        <form className="pw-comment-form" onSubmit={submitComment}>
+          <input
+            value={draft}
+            onChange={ev => setDraft(ev.target.value)}
+            maxLength={140}
+            placeholder={t('commentPlaceholder', { n: authorName })}
+          />
+          <button type="submit" disabled={!draft.trim()}>{t('sendComment')}</button>
+        </form>
       </div>
-
-      <form className="pw-comment-form" onSubmit={submitComment}>
-        <input
-          value={draft}
-          onChange={ev => setDraft(ev.target.value)}
-          maxLength={140}
-          placeholder={t('commentPlaceholder', { n: authorName })}
-        />
-        <button type="submit" disabled={!draft.trim()}>{t('sendComment')}</button>
-      </form>
     </section>
   );
 }
@@ -365,7 +372,17 @@ export default function PosterWall() {
                 ? hasAvatar ? t('craftCtaSubAvatar') : t('craftCtaSubBasic')
                 : t('craftCooldownSub', { n: formatCooldown(game.cooldownRemainingMs) })}
             </span>
-            <span className="pw-cta__arrow" aria-hidden>{game.canCraft ? '→' : '⌁'}</span>
+            <span className="pw-cta__arrow" aria-hidden>
+              {game.canCraft ? (
+                <svg viewBox="0 0 24 24" focusable="false">
+                  <path d="M14 18l-1.4-1.4 3.6-3.6H4v-2h12.2l-3.6-3.6L14 6l6 6-6 6z" />
+                </svg>
+              ) : (
+                <svg viewBox="0 0 24 24" focusable="false">
+                  <path d="M12 22a9.77 9.77 0 0 1-3.9-.79 10.1 10.1 0 0 1-3.18-2.13 10.1 10.1 0 0 1-2.13-3.18A9.77 9.77 0 0 1 2 12a9.77 9.77 0 0 1 .79-3.9 10.1 10.1 0 0 1 2.13-3.18A10.1 10.1 0 0 1 8.1 2.79 9.77 9.77 0 0 1 12 2a9.77 9.77 0 0 1 3.9.79 10.1 10.1 0 0 1 3.18 2.13 10.1 10.1 0 0 1 2.13 3.18A9.77 9.77 0 0 1 22 12a9.77 9.77 0 0 1-.79 3.9 10.1 10.1 0 0 1-2.13 3.18 10.1 10.1 0 0 1-3.18 2.13A9.77 9.77 0 0 1 12 22Zm0-2a7.72 7.72 0 0 0 5.66-2.34A7.72 7.72 0 0 0 20 12a7.72 7.72 0 0 0-2.34-5.66A7.72 7.72 0 0 0 12 4a7.72 7.72 0 0 0-5.66 2.34A7.72 7.72 0 0 0 4 12a7.72 7.72 0 0 0 2.34 5.66A7.72 7.72 0 0 0 12 20Zm3.2-4.2L11 12.6V7h2v4.6l3.4 2.55-1.2 1.65Z" />
+                </svg>
+              )}
+            </span>
           </button>
 
           {!game.isInAigram && <p className="pw-offplatform">{t('offPlatform')}</p>}
@@ -373,22 +390,16 @@ export default function PosterWall() {
 
         {game.generating && (
           <section className="pw-production" aria-live="polite">
+            <div className="pw-production__bench" aria-hidden>
+              <span className="pw-production__bar" />
+              <span className="pw-production__dot" />
+              <span className="pw-production__trace" />
+            </div>
+
             <div className="pw-production__top">
               <span>{t('productionKicker')}</span>
               <strong>{t('productionTitle')}</strong>
               <p>{t(productionCopyKey(game, hasAvatar) as any)}</p>
-            </div>
-
-            <div className="pw-production__bench" aria-hidden>
-              <div className="pw-production__sheet">
-                <span className="pw-production__label">POSTER WALL</span>
-                <span className="pw-production__ink pw-production__ink--one" />
-                <span className="pw-production__ink pw-production__ink--two" />
-                <span className="pw-production__ink pw-production__ink--three" />
-                <span className="pw-production__roller" />
-                <span className="pw-production__shine" />
-                <span className="pw-production__grain" />
-              </div>
             </div>
 
             <div className="pw-production__cue">

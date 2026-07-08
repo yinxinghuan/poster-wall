@@ -7,6 +7,8 @@ import {
   type AigramResponse,
   useGameEvent,
   useGenImage,
+  useRecognize,
+  type RecognizeResult,
 } from '@shared/runtime';
 import { useGameSave } from '@shared/save';
 import {
@@ -35,16 +37,17 @@ const MAX_MINE = 12;
 const MAX_WALL = 24;
 const MAX_LIKES_STORED = 80;
 const CRAFT_COOLDOWN_MS = 12 * 60 * 60 * 1000;
-const USERNAME_FORMAT_REF = './img/style-ref/flat-poster-ref.png';
 
 const DEFAULT_SAVE: PosterSave = { posters: [], totalGenerated: 0 };
 
 function nameGraphicLine(userName?: string) {
-  const clean = (userName || '').replace(/[{}<>"'`]/g, '').replace(/\s+/g, ' ').trim().slice(0, 24);
-  if (!clean) return 'If no usable user name is available, do not invent a name; use abstract poster typography instead.';
+  const clean = (userName || 'YOU').replace(/[{}<>"'`]/g, '').replace(/\s+/g, ' ').trim().slice(0, 24) || 'YOU';
+  const displayName = clean.toUpperCase();
   return [
     `Optional user-name material: "${clean}".`,
+    `Readable text tokens may include "${displayName} LIVE", "ROOM 05", "FRI 22", "22:00", "SIDE A", and "EDITION 07".`,
     'Treat the name as graphic raw material, never as a plain signature: oversized cropped letters, initials, sideways type, venue arrows, edition numbers, access-code labels, show-title fragments, or half-readable decorative typography.',
+    'At least one name-derived letter group must become a major composition mass: cropped by the canvas edge, rotated vertically, or colliding with a date or venue block.',
     'Keep name-derived typography in the center third of the poster so the stacked wall view still shows a recognizable trace.',
   ].join(' ');
 }
@@ -60,34 +63,42 @@ interface PosterPromptTemplate {
   palette: string[];
   typography: string[];
   identity: string;
+  refAsset?: string;
 }
 
 const POSTER_PROMPT_BASE = [
-  'FORMAT CONTRACT: output exactly one flat 2D poster artwork image. The entire image canvas IS the poster artwork.',
-  'The result must look like a direct digital print file or scanned flat graphic, not like a photo of a poster.',
-  'Fill the image from edge to edge with artwork: ink fields, type, symbols, portrait marks, print grain, registration texture, and color blocks.',
-  'ABSOLUTELY FORBIDDEN: room, wall, brick, tile, table, floor, hand, phone, camera, frame, mat board, binder clip, tape, sticker outside the design, hanging hardware, photographed paper, product mockup, poster mockup, realistic lighting, perspective view, drop shadow outside the artwork, blank margin, white border, black border, outer frame, inner frame, smaller poster inside a larger scene.',
-  'Do not generate any real-world environment. Do not show a poster object. Do not show a sheet of paper. Do not show a framed print. Do not show the artwork being photographed.',
-  'If the model is tempted to add a border, replace it with full-bleed background color and internal typography instead.',
-  'Keep all important identity marks, face cues, title mass, name-derived typography, and symbols in the center vertical safe area because the UI crops the image into a 2:3 poster card.',
+  'Create one full-frame flat 2D vector typography artwork, like an exported Illustrator/SVG/risograph graphic design file.',
+  'The entire image is only colored ink shapes, typography, symbols, portrait marks, print grain, registration texture, and flat color blocks on one digital canvas.',
+  'Use the whole square output canvas as the artwork. Color fields and type must touch all four image edges. Do not create a smaller rectangle floating inside unused space.',
+  'Use a flat orthographic front-view composition. Do not make a photo. Only a flat graphic composition. No realistic lighting, no scene, no object, no perspective.',
+  'Fill the output edge-to-edge with the design itself, using solid background color fields and internal typography instead of surrounding space.',
+  'Keep all important identity marks, face cues, title mass, name-derived typography, and symbols in the center vertical safe area because the UI crops the image into a 2:3 card.',
   'Use high typographic tension: oversized cropped headline letters bleeding off the canvas, vertical type spines, diagonal cuts, compressed side labels, strong scale contrast, and asymmetrical negative space.',
-  'Use fictional English venue and show text only. Text can be fragmented, cropped, hand-lettered, semi-readable, or imperfect, but it must be part of the poster design.',
+  'Typography must drive the composition, not decorate it. Use three clear text scales: one huge cropped word or name fragment dominating about half the canvas, one medium event line or date block, and a few tiny venue/catalog notes.',
+  'Avoid calm centered layouts, equal margins, evenly spaced blocks, and polite poster templates. Create pressure by making type touch edges, collide with rules, run vertically, stack tightly, or cut through color fields.',
+  'The design cannot be wordless. Include visible fictional English show information such as title, venue, date, time, edition number, door note, side label, or lineup fragments.',
+  'For better spelling, print only short English words and short numeric labels. Avoid long paragraphs, fake body copy, and dense unreadable microtext.',
+  'Use fictional English venue and show text only. Text may be cropped, stacked, vertical, or hand-lettered, but the largest visible words should be readable.',
   'Make it feel like mature print culture: gig flyer, showbill, zine poster, venue placard, indie event poster, Swiss programme, or risograph screenprint.',
-  'No app UI, no social-media story UI, no QR code, no external brand logo, no Aigram logo, no Chinese sticker marks, no skateboard, no wheels, no wanted-poster trope, no childish cartoon.',
+  'No app UI, no social-media story UI, no QR code, no external brand logo, no Aigram logo, no skateboard, no wheels, no wanted-poster trope, no childish cartoon.',
 ].join(' ');
 
 const AVATAR_IDENTITY_RULE = [
-  'Use the reference avatar as the social identity source.',
+  'Use the reference avatar only as the social identity source, not as a scene, object, photo frame, or layout reference.',
   'Reinterpret broad traits only: face silhouette, hair direction, expression energy, color temperature, accessory hints, and attitude.',
-  'The user must be visibly present as a designed performer portrait, symbolic stage icon, or print-culture character.',
+  'The user must be visibly present as a designed performer portrait, symbolic stage icon, or print-culture character integrated into the poster typography.',
   'Redraw the identity in flat ink, risograph, linocut, halftone, vector, or screenprint language. No photographic skin, no camera lighting, no pasted photo, no circular avatar, no selfie, no photorealistic headshot, and no cute caricature.',
+  'The face or identity mark should be cropped, overprinted, masked by letters, or reduced into a two-color portrait symbol. It must never appear as a separate photo placed on top of the poster.',
+  'Typography remains the dominant structure even in avatar mode: oversized event text and name-derived type should push across or around the portrait.',
 ].join(' ');
 
 const USERNAME_IDENTITY_RULE = [
   'There is no avatar. Use the user name as the social identity source.',
-  'A flat poster reference may be supplied only to lock the output format and typography hierarchy: full-bleed 2D poster artwork with visible event text, no photographed scene. Do not copy its exact text, colors, layout, or symbols.',
+  'This is a pure text-to-image generation path: no reference image, no avatar image, no physical poster mockup, and no photographed scene.',
+  'Do not copy any old cached reference words such as BACK, ROOM, TONIGHT, SIDE A, LIVE, FRI, EAST STAGE, POSTER WALL, NOISE, LATE, SHIFT, ECHO, SIDE B, ROOM 14, NORTH LINE, or TYPE SHOULD FEEL TOO LARGE.',
+  'Create a new typographic composition from the current user name and fictional show information; invent the main axis, crop points, color placement, and text positions.',
   'Turn the name into the main 2D graphic: large cropped letters, initials, vertical fragments, ticket-code typography, venue stamp, hand-lettered stage name, or half-readable title mass.',
-  'The typographic layout should feel tense and designed: one oversized name/title element should push beyond the canvas edge, while smaller date and venue details lock around it.',
+  'The typographic layout should feel tense and designed: one oversized name/title element should push beyond the canvas edge, while smaller date and venue details lock around it. The largest type should feel almost too big for the poster.',
   'Generate your own fictional English show title, room label, date, time, edition number, and small venue notes as part of the poster.',
   'The name should feel integrated into the design, not placed as a plain signature.',
   'All lettering must sit directly on the flat design canvas, never on a photographed sheet, wall, signboard, or framed object.',
@@ -99,7 +110,7 @@ const PROMPT_TEMPLATES: PosterPromptTemplate[] = [
     mode: 'both',
     tone: 'acid',
     concept: 'underground zine night, warning signage, occult diagram marks, xerox grit, serious after-hours energy',
-    layout: 'one heavy central icon, small astronomy diagrams, safety pictograms, condensed title fragments stacked around the center',
+    layout: 'one huge cropped warning word across the middle, a vertical name spine, small astronomy diagrams, safety pictograms, condensed title fragments stacked tightly around the center',
     palette: ['acid yellow and deep black only', 'safety orange and black with dirty cream ink', 'black paper with sulfur yellow ink'],
     typography: ['rough condensed block type', 'stamped hazard labels', 'cropped all-night show codes'],
     identity: 'For avatar mode, turn the face into a central engraved performer head. For username mode, turn the name into a hazard-label title and warning-code fragments.',
@@ -109,7 +120,7 @@ const PROMPT_TEMPLATES: PosterPromptTemplate[] = [
     mode: 'both',
     tone: 'paper',
     concept: 'local underground music and comedy flyer, art-school handbill, casual venue-night charm',
-    layout: 'flat paper field, loose marker arrows, wavy lines, one sitting or leaning performer silhouette, small venue metadata along the edges',
+    layout: 'flat paper field, loose marker arrows, one oversized hand-lettered name block, wavy lines pressing into the title, one sitting or leaning performer silhouette, small venue metadata along the edges',
     palette: ['pastel cyan, red, cream, and black', 'soft yellow paper with red marker and black ink', 'dusty pink paper with green and black ink'],
     typography: ['hand-lettered headline', 'marker arrows', 'imperfect small event notes'],
     identity: 'For avatar mode, make the performer silhouette inherit the avatar face and hair. For username mode, turn the name into messy stage lettering across the central third.',
@@ -119,10 +130,21 @@ const PROMPT_TEMPLATES: PosterPromptTemplate[] = [
     mode: 'both',
     tone: 'neon',
     concept: 'Tokyo indie flyer meets board-game insert, snack-packaging energy, funny but mature weirdness',
-    layout: 'large expressive central character or mascot-like performer, dense side labels, oversized title shapes, screenprint registration texture',
+    layout: 'large expressive central character or mascot-like performer interrupted by cropped package typography, dense side labels, oversized title shapes, screenprint registration texture',
     palette: ['saturated red, teal, pink, cream, and black', 'cobalt blue, hot pink, rice paper, and ink black', 'tomato red, mint green, pale blue, and black'],
     typography: ['distorted hand-painted Latin letters', 'kana-like Latin fragments', 'small fake catalog stamps'],
     identity: 'For avatar mode, derive the central face from the avatar. For username mode, make the name huge, playful, and cropped like packaging typography.',
+  },
+  {
+    id: 'fluoro-notice-bill',
+    mode: 'both',
+    tone: 'neon',
+    concept: 'duotone fluorescent notice bill: one colored paper stock plus one single ink color, designed so many different paper colors collide beautifully when stacked on the wall',
+    layout: 'full canvas is one uninterrupted solid paper color; every printed element uses the same single ink color only: heavy invented masthead across the top, dot-and-bar registration marks, one rectangular one-ink portrait or illustration window, orderly event information below, and small one-ink stamps at the bottom edge',
+    palette: ['fluorescent orange paper plus black ink only', 'fluorescent green paper plus black ink only', 'cyan paper plus black ink only', 'hot pink paper plus black ink only', 'warm butter paper plus black ink only'],
+    typography: ['chunky rounded grotesk masthead with dot accents', 'typewriter-like italic subhead', 'condensed black event metadata'],
+    identity: 'Strict duotone rule: exactly one background paper color and exactly one ink color. No third color, no gradients, no colored illustration, no multicolor type, no shadows, no lighting. Do not copy the real word CESURE or any real event logo. Invent a short fictional masthead. For avatar mode, turn the avatar into a one-ink portrait or icon window. For username mode, make the user name the secondary event title or performer line, not a signature.',
+    refAsset: './img/style-ref/fluoro-notice-ref.png',
   },
   {
     id: 'subway-showbill',
@@ -159,7 +181,7 @@ const PROMPT_TEMPLATES: PosterPromptTemplate[] = [
     mode: 'both',
     tone: 'neon',
     concept: 'fashion-week schedule poster translated into live-show culture, editorial and high contrast',
-    layout: 'overlapping roster blocks, edition number, large date, vertical name fragments, clean grid with one disruptive symbol',
+    layout: 'overlapping roster blocks, edition number, huge cropped date, vertical name fragments, clean grid with one disruptive symbol and tight microtype at the bottom edge',
     palette: ['electric yellow, black, and small magenta accents', 'mint green, black, and cream', 'pale lavender, black, and red'],
     typography: ['oversized compressed roster type', 'thin rule lines', 'tiny edition codes'],
     identity: 'For avatar mode, turn the avatar into a fashion-campaign performer mark. For username mode, split the name into roster entries and oversized initials.',
@@ -169,7 +191,7 @@ const PROMPT_TEMPLATES: PosterPromptTemplate[] = [
     mode: 'both',
     tone: 'acid',
     concept: 'comedy museum signage, backstage labels, wayfinding panels, deadpan institutional humor',
-    layout: 'cut-corner sign panels, arrows, room numbers, one bold exhibit-like portrait or name plaque, strong negative space',
+    layout: 'cut-corner sign panels, arrows, room numbers, one bold exhibit-like portrait or name plaque, one oversized cropped punchline word, strong negative space',
     palette: ['deep green, pink, black, and cream', 'red, yellow, black, and off-white', 'blue, cream, and signal red'],
     typography: ['blocky signage type', 'museum label captions', 'numbered room codes'],
     identity: 'For avatar mode, make the avatar a printed exhibit portrait. For username mode, make the name a room label and punchline-like title.',
@@ -199,7 +221,33 @@ function promptTemplateFor(mode: PosterPromptMode, seed: string) {
   return pickForSeed(pool, seed, mode);
 }
 
-function buildPosterPrompt(mode: PosterPromptMode, userName: string | undefined, seed: string) {
+function cueList(items: string[] | undefined, limit: number) {
+  const blocked = /\b(age|young|old|male|female|woman|man|girl|boy|asian|latino|ethnicity|race)\b/i;
+  return [...new Set(items || [])]
+    .map(item => item.replace(/[{}<>"'`]/g, '').replace(/\s+/g, ' ').trim())
+    .filter(item => item && !blocked.test(item))
+    .slice(0, limit);
+}
+
+function avatarCueLine(result?: RecognizeResult | null) {
+  if (!result) {
+    return 'Avatar text cue: recognition was unavailable. Use the user name as the main social identity and invent a mature flat performer mark.';
+  }
+  const caption = result.caption?.replace(/[{}<>"'`]/g, '').replace(/\s+/g, ' ').trim().slice(0, 160);
+  const labels = cueList(result.labels, 8);
+  const attributes = cueList(result.attributes, 8);
+  const parts = cueList(result.parts, 8);
+  return [
+    'Avatar text cue from visual recognition only; do not paste or reconstruct the source photo.',
+    caption ? `Caption: ${caption}.` : '',
+    labels.length ? `Visual labels: ${labels.join(', ')}.` : '',
+    attributes.length ? `Graphic traits: ${attributes.join(', ')}.` : '',
+    parts.length ? `Useful parts: ${parts.join(', ')}.` : '',
+    'Use these cues only as design direction for silhouette, hair/shape rhythm, expression energy, color temperature, accessory hints, and stage attitude. Do not make demographic claims.',
+  ].filter(Boolean).join(' ');
+}
+
+function buildPosterPrompt(mode: PosterPromptMode, userName: string | undefined, seed: string, avatarCue?: RecognizeResult | null) {
   const template = promptTemplateFor(mode, seed);
   const palette = pickForSeed(template.palette, seed, 'palette');
   const type = pickForSeed(template.typography, seed, 'type');
@@ -207,6 +255,7 @@ function buildPosterPrompt(mode: PosterPromptMode, userName: string | undefined,
   const prompt = [
     POSTER_PROMPT_BASE,
     identityRule,
+    mode === 'avatar' ? avatarCueLine(avatarCue) : '',
     nameGraphicLine(userName),
     `Template: ${template.concept}.`,
     `Layout: ${template.layout}.`,
@@ -214,8 +263,8 @@ function buildPosterPrompt(mode: PosterPromptMode, userName: string | undefined,
     `Typography: ${type}.`,
     template.identity,
     'Keep the strongest identity mark in the center vertical safe area. Make this poster look different from other templates in composition, not only in color.',
-  ].join(' ');
-  return { prompt, posterTone: template.tone, templateId: template.id };
+  ].filter(Boolean).join(' ');
+  return { prompt, posterTone: template.tone, templateId: template.id, refAsset: template.refAsset };
 }
 
 function makeId() {
@@ -227,9 +276,10 @@ function absoluteImageUrl(url: string) {
   return url.startsWith('http') ? url : new URL(url, document.baseURI).href;
 }
 
-function formatReferenceUrl() {
-  const url = absoluteImageUrl(USERNAME_FORMAT_REF);
-  if (/^https?:\/\/(localhost|127\.0\.0\.1)(:|\/)/.test(url)) return undefined;
+function publicRefUrl(path?: string) {
+  if (!path) return undefined;
+  const url = absoluteImageUrl(path);
+  if (!url.startsWith('https://')) return undefined;
   return url;
 }
 
@@ -338,6 +388,7 @@ export function usePosterWall() {
   const { savedData, persist } = useGameSave<PosterSave>('poster-wall');
   const { trigger } = useGameEvent();
   const gen = useGenImage();
+  const { recognize } = useRecognize();
   const [mirror, setMirror] = useState<PosterSave | undefined>(undefined);
   const [profile, setProfile] = useState<ProfileInfo | null>(null);
   const [profileLoaded, setProfileLoaded] = useState(false);
@@ -347,7 +398,7 @@ export function usePosterWall() {
   const [status, setStatus] = useState<PosterStatus>('idle');
   const [startedAt, setStartedAt] = useState(0);
   const [elapsedMs, setElapsedMs] = useState(0);
-  const [generationPhase, setGenerationPhase] = useState<'idle' | 'art' | 'saving'>('idle');
+  const [generationPhase, setGenerationPhase] = useState<'idle' | 'reading' | 'art' | 'saving'>('idle');
   const [selected, setSelected] = useState<WallEntry | null>(null);
   const [error, setError] = useState('');
   const [scale, setScale] = useState(1);
@@ -511,6 +562,7 @@ export function usePosterWall() {
 
   const stageLabel = useMemo(() => {
     if (status !== 'generating') return '';
+    if (generationPhase === 'reading') return 'stageRead';
     if (generationPhase === 'saving') return 'stageSeal';
     const elapsed = elapsedMs;
     if (elapsed < 35000) return 'stagePrep';
@@ -522,15 +574,24 @@ export function usePosterWall() {
     setStatus('generating');
     setStartedAt(Date.now());
     setElapsedMs(0);
-    setGenerationPhase('art');
     setError('');
     const hasAvatar = !!profile?.head_url;
+    setGenerationPhase(hasAvatar ? 'reading' : 'art');
     const draftId = makeId();
     const draftCreatedAt = Date.now();
-    const promptSpec = buildPosterPrompt(hasAvatar ? 'avatar' : 'username', profile?.name, `${draftId}-${draftCreatedAt}`);
     try {
-      const refUrl = hasAvatar ? profile!.head_url! : formatReferenceUrl();
-      const imageUrl = await gen.generate({ prompt: promptSpec.prompt, ...(refUrl ? { ref_url: refUrl } : {}) });
+      let avatarCue: RecognizeResult | null = null;
+      if (hasAvatar) {
+        try {
+          avatarCue = await recognize({ image_url: profile!.head_url!, mode: 'face' });
+        } catch {
+          avatarCue = null;
+        }
+      }
+      setGenerationPhase('art');
+      const promptSpec = buildPosterPrompt(hasAvatar ? 'avatar' : 'username', profile?.name, `${draftId}-${draftCreatedAt}`, avatarCue);
+      const refUrl = publicRefUrl(promptSpec.refAsset);
+      const imageUrl = await gen.generate(refUrl ? { prompt: promptSpec.prompt, ref_url: refUrl } : { prompt: promptSpec.prompt });
       setGenerationPhase('saving');
       await preloadImage(imageUrl);
       const now = Date.now();
@@ -564,7 +625,7 @@ export function usePosterWall() {
       setGenerationPhase('idle');
       setError(e instanceof Error ? e.message : String(e));
     }
-  }, [canCraft, gen, mirror, persist, profile, refreshWall, status]);
+  }, [canCraft, gen, mirror, persist, profile, recognize, refreshWall, status]);
 
   const myUserId = telegramId ? String(telegramId) : 'self';
 

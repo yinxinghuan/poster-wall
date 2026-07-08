@@ -1,0 +1,53 @@
+[
+  {
+    "id": "hex-zine-portrait",
+    "mode": "username",
+    "src": "./img/review-generated/templates/hex-zine-portrait.jpg"
+  },
+  {
+    "id": "upstairs-handbill",
+    "mode": "username",
+    "src": "./img/review-generated/templates/upstairs-handbill.jpg"
+  },
+  {
+    "id": "tokyo-pulp-flyer",
+    "mode": "username",
+    "src": "./img/review-generated/templates/tokyo-pulp-flyer.jpg"
+  },
+  {
+    "id": "fluoro-notice-bill",
+    "mode": "username",
+    "src": "./img/review-generated/templates/fluoro-notice-bill.jpg",
+    "ref": "./img/style-ref/fluoro-notice-ref.png"
+  },
+  {
+    "id": "subway-showbill",
+    "mode": "avatar cue",
+    "src": "./img/review-generated/templates/subway-showbill.jpg"
+  },
+  {
+    "id": "swiss-type-system",
+    "mode": "avatar cue",
+    "src": "./img/review-generated/templates/swiss-type-system.jpg"
+  },
+  {
+    "id": "color-block-program",
+    "mode": "avatar cue",
+    "src": "./img/review-generated/templates/color-block-program.jpg"
+  },
+  {
+    "id": "fashion-week-roster",
+    "mode": "username",
+    "src": "./img/review-generated/templates/fashion-week-roster.jpg"
+  },
+  {
+    "id": "museum-comedy-label",
+    "mode": "username",
+    "src": "./img/review-generated/templates/museum-comedy-label.jpg"
+  },
+  {
+    "id": "xerox-photo-silhouette",
+    "mode": "avatar cue",
+    "src": "./img/review-generated/templates/xerox-photo-silhouette.jpg"
+  }
+]

@@ -26,6 +26,27 @@ declare module '@shared/runtime' {
     lastUrl: string | null;
   }
   export function useGenImage(): UseGenImage;
+  export type RecognizeMode = 'object' | 'face' | 'scene';
+  export interface RecognizeOptions {
+    image_url: string;
+    mode?: RecognizeMode;
+  }
+  export interface RecognizeResult {
+    ok: true;
+    mode: RecognizeMode;
+    labels: string[];
+    attributes: string[];
+    parts: string[];
+    caption: string;
+    confidence: number;
+  }
+  export interface UseRecognize {
+    recognize: (opts: RecognizeOptions) => Promise<RecognizeResult>;
+    loading: boolean;
+    error: Error | null;
+    lastResult: RecognizeResult | null;
+  }
+  export function useRecognize(): UseRecognize;
   export interface UseGameEvent {
     trigger: (event: string, configJson?: object | string) => void;
     canEmit: boolean;
