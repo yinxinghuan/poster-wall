@@ -115,7 +115,7 @@ function GeneratorBar({ state }: { state: 'ready' | 'cooldown' | 'avatar' }) {
       </div>
       <button className={`pwr-audit-cta ${!ready ? 'pwr-audit-cta--cooldown' : ''}`} type="button">
         <span>{ready ? 'Make poster' : 'Print room closed'}</span>
-        <small>{ready ? 'Make a basic poster now; add an avatar later' : 'Next poster opens in 12h 00m'}</small>
+        <small>{ready ? 'Make a basic poster now; add an avatar later' : 'Next poster opens in 3h 00m'}</small>
         <i>{ready ? <ArrowIcon /> : <ClockIcon />}</i>
       </button>
       <p className="pwr-audit-preview-note">Standalone preview · profile data arrives inside Aigram.</p>
