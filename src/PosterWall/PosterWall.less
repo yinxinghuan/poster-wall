@@ -255,7 +255,7 @@
 }
 
 .pw-wall--grid .pw-wall__deck {
-  height: 1300px;
+  height: 890px;
 }
 
 .pw-wall-empty {
@@ -329,7 +329,7 @@
 .pw-card {
   position: absolute;
   width: var(--pw-w, 154px);
-  height: var(--pw-h, 231px);
+  height: var(--pw-h, 154px);
   min-width: 0;
   border: 0;
   padding: 0;
@@ -355,7 +355,7 @@
   overflow: hidden;
   background-image: var(--poster-img);
   background-position: center;
-  background-size: auto 112%;
+  background-size: cover;
   background-repeat: no-repeat;
   box-shadow: 0 18px 50px rgba(0,0,0,0.34);
   pointer-events: none;
@@ -363,71 +363,71 @@
 }
 
 .pw-wall--stack .pw-card--slot-0 {
-  --pw-w: 246px;
-  --pw-h: 369px;
-  left: 54px;
-  top: 34px;
+  --pw-w: 266px;
+  --pw-h: 266px;
+  left: 44px;
+  top: 46px;
   z-index: 40;
   transform: rotate(-1deg);
 }
 
 .pw-wall--stack .pw-card--slot-1 {
-  --pw-w: 216px;
-  --pw-h: 324px;
+  --pw-w: 220px;
+  --pw-h: 220px;
   left: 16px;
-  top: 76px;
+  top: 80px;
   z-index: 28;
   transform: rotate(-9deg);
 }
 
 .pw-wall--stack .pw-card--slot-2 {
-  --pw-w: 216px;
-  --pw-h: 324px;
-  left: 124px;
-  top: 64px;
+  --pw-w: 220px;
+  --pw-h: 220px;
+  left: 118px;
+  top: 76px;
   z-index: 27;
   transform: rotate(7deg);
 }
 
 .pw-wall--stack .pw-card--slot-3 {
   --pw-w: 196px;
-  --pw-h: 294px;
-  left: -8px;
-  top: 148px;
+  --pw-h: 196px;
+  left: -2px;
+  top: 158px;
   z-index: 22;
   transform: rotate(6deg);
 }
 
 .pw-wall--stack .pw-card--slot-4 {
   --pw-w: 196px;
-  --pw-h: 294px;
-  left: 166px;
-  top: 156px;
+  --pw-h: 196px;
+  left: 160px;
+  top: 166px;
   z-index: 21;
   transform: rotate(-6deg);
 }
 
 .pw-wall--stack .pw-card--slot-5 {
   --pw-w: 184px;
-  --pw-h: 276px;
+  --pw-h: 184px;
   left: 84px;
-  top: 202px;
+  top: 230px;
   z-index: 20;
   transform: rotate(3deg);
 }
 
 .pw-wall--stack .pw-card--slot-6 {
   --pw-w: 168px;
-  --pw-h: 252px;
+  --pw-h: 168px;
   left: -24px;
-  top: 24px;
+  top: 18px;
   z-index: 12;
   transform: rotate(10deg);
 }
 
 .pw-wall--stack .pw-card--slot-7 {
   --pw-w: 168px;
-  --pw-h: 252px;
+  --pw-h: 168px;
   left: 210px;
   top: 28px;
   z-index: 11;
@@ -436,18 +436,18 @@
 
 .pw-wall--stack .pw-card--slot-8 {
   --pw-w: 160px;
-  --pw-h: 240px;
+  --pw-h: 160px;
   left: 8px;
-  top: 262px;
+  top: 302px;
   z-index: 10;
   transform: rotate(-4deg);
 }
 
 .pw-wall--stack .pw-card--slot-9 {
   --pw-w: 160px;
-  --pw-h: 240px;
+  --pw-h: 160px;
   left: 188px;
-  top: 266px;
+  top: 306px;
   z-index: 9;
   transform: rotate(6deg);
 }
@@ -462,7 +462,7 @@
 
 .pw-wall--grid .pw-card {
   --pw-w: 154px;
-  --pw-h: 231px;
+  --pw-h: 154px;
   transform: rotate(0deg);
   z-index: var(--z);
 }
@@ -473,14 +473,14 @@
 
 .pw-wall--grid .pw-card--slot-0 { left: 12px; top: 10px; }
 .pw-wall--grid .pw-card--slot-1 { left: 188px; top: 10px; }
-.pw-wall--grid .pw-card--slot-2 { left: 12px; top: 260px; }
-.pw-wall--grid .pw-card--slot-3 { left: 188px; top: 260px; }
-.pw-wall--grid .pw-card--slot-4 { left: 12px; top: 510px; }
-.pw-wall--grid .pw-card--slot-5 { left: 188px; top: 510px; }
-.pw-wall--grid .pw-card--slot-6 { left: 12px; top: 760px; }
-.pw-wall--grid .pw-card--slot-7 { left: 188px; top: 760px; }
-.pw-wall--grid .pw-card--slot-8 { left: 12px; top: 1010px; }
-.pw-wall--grid .pw-card--slot-9 { left: 188px; top: 1010px; }
+.pw-wall--grid .pw-card--slot-2 { left: 12px; top: 184px; }
+.pw-wall--grid .pw-card--slot-3 { left: 188px; top: 184px; }
+.pw-wall--grid .pw-card--slot-4 { left: 12px; top: 358px; }
+.pw-wall--grid .pw-card--slot-5 { left: 188px; top: 358px; }
+.pw-wall--grid .pw-card--slot-6 { left: 12px; top: 532px; }
+.pw-wall--grid .pw-card--slot-7 { left: 188px; top: 532px; }
+.pw-wall--grid .pw-card--slot-8 { left: 12px; top: 706px; }
+.pw-wall--grid .pw-card--slot-9 { left: 188px; top: 706px; }
 
 .pw-generator {
   position: absolute;
@@ -932,10 +932,10 @@
 .pw-detail__poster {
   position: absolute;
   left: 50%;
-  top: 54px;
+  top: 80px;
   z-index: 2;
-  width: 292px;
-  height: 438px;
+  width: 324px;
+  height: 324px;
   border: 0;
   padding: 0;
   background: transparent;
@@ -968,7 +968,7 @@
   position: absolute;
   left: 20px;
   right: 20px;
-  top: 530px;
+  top: 434px;
   width: auto;
   min-height: 46px;
   display: flex;
@@ -981,7 +981,7 @@
   position: absolute;
   left: 20px;
   right: 20px;
-  top: 578px;
+  top: 486px;
   bottom: 18px;
   padding-top: 11px;
   color: @fg;

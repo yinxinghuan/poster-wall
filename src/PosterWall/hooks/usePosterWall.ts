@@ -43,11 +43,20 @@ const DEFAULT_SAVE: PosterSave = { posters: [], totalGenerated: 0 };
 function nameGraphicLine(userName?: string) {
   const clean = (userName || 'YOU').replace(/[{}<>"'`]/g, '').replace(/\s+/g, ' ').trim().slice(0, 24) || 'YOU';
   const displayName = clean.toUpperCase();
+  const initials = clean
+    .split(/\s+/)
+    .map(part => part[0])
+    .join('')
+    .slice(0, 4)
+    .toUpperCase() || displayName.slice(0, 4);
+  const exactName = displayName.length > 18 ? displayName.slice(0, 18).trim() : displayName;
   return [
-    `Optional user-name material: "${clean}".`,
-    `Readable text tokens may include "${displayName} LIVE", "ROOM 05", "FRI 22", "22:00", "SIDE A", and "EDITION 07".`,
+    `Required user-name material: "${clean}".`,
+    `Mandatory exact-name text: the poster must contain one readable instance of "${exactName}" spelled exactly, preferably as the performer name, show title, or vertical title spine.`,
+    `Do not satisfy the name requirement with initials only, lookalike random letters, misspelled variants, or fake words. Initials "${initials}" may appear only as secondary ornament.`,
+    `Readable text tokens may include "${exactName}", "${exactName} LIVE", "${exactName} 22:00", "${initials} ROOM", "ROOM 05", "FRI 22", "SIDE A", and "EDITION 07".`,
     'Treat the name as graphic raw material, never as a plain signature: oversized cropped letters, initials, sideways type, venue arrows, edition numbers, access-code labels, show-title fragments, or half-readable decorative typography.',
-    'At least one name-derived letter group must become a major composition mass: cropped by the canvas edge, rotated vertically, or colliding with a date or venue block.',
+    'The exact readable name can be integrated into a major composition mass, but one instance must remain legible while other name-derived letters may be cropped by the canvas edge, rotated vertically, or colliding with a date or venue block.',
     'Keep name-derived typography in the center third of the poster so the stacked wall view still shows a recognizable trace.',
   ].join(' ');
 }
@@ -69,10 +78,10 @@ interface PosterPromptTemplate {
 const POSTER_PROMPT_BASE = [
   'Create one full-frame flat 2D vector typography artwork, like an exported Illustrator/SVG/risograph graphic design file.',
   'The entire image is only colored ink shapes, typography, symbols, portrait marks, print grain, registration texture, and flat color blocks on one digital canvas.',
-  'Use the whole square output canvas as the artwork. Color fields and type must touch all four image edges. Do not create a smaller rectangle floating inside unused space.',
-  'Use a flat orthographic front-view composition. Do not make a photo. Only a flat graphic composition. No realistic lighting, no scene, no object, no perspective.',
+  'Use the whole square output canvas as one square gig poster, showbill, or flyer artwork. Color fields and type must touch all four image edges. Do not create a smaller rectangle floating inside unused space.',
+  'Use a flat orthographic front-view square composition. Do not make a photo. Only a flat graphic composition. No realistic lighting, no scene, no object, no perspective.',
   'Fill the output edge-to-edge with the design itself, using solid background color fields and internal typography instead of surrounding space.',
-  'Keep all important identity marks, face cues, title mass, name-derived typography, and symbols in the center vertical safe area because the UI crops the image into a 2:3 card.',
+  'Keep all important identity marks, face cues, title mass, name-derived typography, and symbols inside the square artwork; the app displays the generated image as a square card without vertical cropping.',
   'Use high typographic tension: oversized cropped headline letters bleeding off the canvas, vertical type spines, diagonal cuts, compressed side labels, strong scale contrast, and asymmetrical negative space.',
   'Typography must drive the composition, not decorate it. Use three clear text scales: one huge cropped word or name fragment dominating about half the canvas, one medium event line or date block, and a few tiny venue/catalog notes.',
   'Avoid calm centered layouts, equal margins, evenly spaced blocks, and polite poster templates. Create pressure by making type touch edges, collide with rules, run vertically, stack tightly, or cut through color fields.',
@@ -84,11 +93,12 @@ const POSTER_PROMPT_BASE = [
 ].join(' ');
 
 const AVATAR_IDENTITY_RULE = [
-  'Use the avatar text cue only as the social identity source, not as a scene, object, photo frame, or layout reference.',
+  'Use the reference avatar image and avatar text cue only as the social identity source, not as a scene, object, photo frame, or layout reference.',
   'Reinterpret broad traits only: face silhouette, hair direction, expression energy, color temperature, accessory hints, and attitude.',
   'The avatar-derived identity is the main subject of the poster, not a small accent, background texture, or optional side note.',
   'At least three avatar-derived visual cues must visibly shape the central portrait, emblem, symbol, palette accent, or typographic rhythm.',
   'The user must be visibly present as a designed performer portrait, symbolic stage icon, personal emblem, or print-culture character integrated into the poster typography.',
+  'A pure typography-only poster is invalid in avatar mode: include a visible non-photographic face, silhouette, mask, performer icon, or identity emblem derived from the avatar.',
   'Redraw the identity in flat ink, risograph, linocut, halftone, vector, or screenprint language. No photographic skin, no camera lighting, no pasted photo, no circular avatar, no selfie, no photorealistic headshot, and no cute caricature.',
   'The face or identity mark should occupy the central safe area, then be cropped, overprinted, masked by letters, or reduced into a two-color portrait symbol. It must never appear as a separate photo placed on top of the poster.',
   'Typography remains the dominant structure even in avatar mode: oversized event text and name-derived type should push across or around the portrait.',
@@ -218,9 +228,10 @@ function pickForSeed<T>(items: T[], seed: string, salt: string): T {
   return items[seedScore(`${seed}:${salt}`) % items.length];
 }
 
-function promptTemplateFor(mode: PosterPromptMode, seed: string) {
+function promptTemplateFor(mode: PosterPromptMode, seed: string, avoidTemplateId?: string) {
   const pool = PROMPT_TEMPLATES.filter(template => template.mode === mode || template.mode === 'both');
-  return pickForSeed(pool, seed, mode);
+  const contrastPool = avoidTemplateId ? pool.filter(template => template.id !== avoidTemplateId) : pool;
+  return pickForSeed(contrastPool.length ? contrastPool : pool, seed, mode);
 }
 
 function cueList(items: string[] | undefined, limit: number) {
@@ -253,15 +264,26 @@ function avatarIdentityPriorityLine(userName?: string) {
   const clean = (userName || 'YOU').replace(/[{}<>"'`]/g, '').replace(/\s+/g, ' ').trim().slice(0, 24) || 'YOU';
   return [
     'The template supplies print language only; the avatar-derived identity must decide the poster subject.',
-    'Make the central identity form large enough that a viewer can tell this is a personal poster even when the wall view crops it into a 2:3 card.',
+    'Make the central identity form large enough that a viewer can tell this is a personal poster even when the wall view stacks it as a smaller square card.',
     'Reflect the avatar cues in at least two different design layers: the main portrait or emblem, the supporting symbol or illustration, the accent palette, the crop shape, or the type rhythm.',
-    `If the name "${clean}" appears, weave it through the identity mark as cropped letters, stage-title fragments, or vertical type rather than a plain author credit.`,
+    `The name "${clean}" must appear as part of the poster design, woven through the identity mark as cropped letters, stage-title fragments, or vertical type rather than a plain author credit.`,
     'Do not produce a generic event flyer that would look the same for another user.',
   ].join(' ');
 }
 
-function buildPosterPrompt(mode: PosterPromptMode, userName: string | undefined, seed: string, avatarCue?: RecognizeResult | null) {
-  const template = promptTemplateFor(mode, seed);
+function previousPosterContrastLine(previous?: PosterEntry) {
+  if (!previous?.posterTemplate) {
+    return 'No previous poster to avoid; create a decisive one-off composition.';
+  }
+  return [
+    'Consecutive-poster contrast: do not make this poster feel like a sibling copy of the last saved poster.',
+    `Avoid repeating the previous template family: ${previous.posterTemplate}.`,
+    'Change at least four visible traits from the previous poster: template structure, background color, headline crop, portrait or symbol shape, type axis, and negative-space rhythm.',
+  ].join(' ');
+}
+
+function buildPosterPrompt(mode: PosterPromptMode, userName: string | undefined, seed: string, avatarCue?: RecognizeResult | null, previousPoster?: PosterEntry) {
+  const template = promptTemplateFor(mode, seed, previousPoster?.posterTemplate);
   const palette = pickForSeed(template.palette, seed, 'palette');
   const type = pickForSeed(template.typography, seed, 'type');
   const identityRule = mode === 'avatar' ? AVATAR_IDENTITY_RULE : USERNAME_IDENTITY_RULE;
@@ -276,6 +298,7 @@ function buildPosterPrompt(mode: PosterPromptMode, userName: string | undefined,
     `Typography: ${type}.`,
     template.identity,
     mode === 'avatar' ? avatarIdentityPriorityLine(userName) : '',
+    previousPosterContrastLine(previousPoster),
     'Keep the strongest identity mark in the center vertical safe area. Make this poster look different from other templates in composition, not only in color.',
   ].filter(Boolean).join(' ');
   return { prompt, posterTone: template.tone, templateId: template.id, refAsset: template.refAsset };
@@ -603,9 +626,11 @@ export function usePosterWall() {
         }
       }
       setGenerationPhase('art');
-      const promptSpec = buildPosterPrompt(hasAvatar ? 'avatar' : 'username', profile?.name, `${draftId}-${draftCreatedAt}`, avatarCue);
-      const refUrl = publicRefUrl(promptSpec.refAsset);
-      const imageUrl = await gen.generate(refUrl ? { prompt: promptSpec.prompt, ref_url: refUrl } : { prompt: promptSpec.prompt });
+      const previousPoster = mirror.posters[0];
+      const promptSpec = buildPosterPrompt(hasAvatar ? 'avatar' : 'username', profile?.name, `${draftId}-${draftCreatedAt}`, avatarCue, previousPoster);
+      const styleRefUrl = publicRefUrl(promptSpec.refAsset);
+      const imageRefUrl = hasAvatar && profile?.head_url ? profile.head_url : styleRefUrl;
+      const imageUrl = await gen.generate(imageRefUrl ? { prompt: promptSpec.prompt, ref_url: imageRefUrl } : { prompt: promptSpec.prompt });
       setGenerationPhase('saving');
       await preloadImage(imageUrl);
       const now = Date.now();
