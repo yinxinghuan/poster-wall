@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gig Wall · Avatar poster review</title>
+  <style>
+    :root { color-scheme: dark; --ink:#eee7d5; --muted:#a8a397; --line:#34332f; --blue:#4dcfe8; --red:#f31313; --green:#5ee19c; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:#151515; color:var(--ink); font:14px/1.5 Helvetica Neue,Helvetica,Arial,sans-serif; }
+    main { width:min(1180px,calc(100% - 40px)); margin:0 auto; padding:42px 0 80px; }
+    header { display:flex; justify-content:space-between; gap:32px; align-items:flex-end; border-bottom:1px solid var(--line); padding-bottom:28px; }
+    .kicker { color:var(--blue); font-size:11px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; }
+    h1 { margin:6px 0 8px; font-size:clamp(34px,6vw,72px); line-height:.95; letter-spacing:-.06em; }
+    h2 { margin:0 0 8px; font-size:26px; letter-spacing:-.04em; }
+    p { color:var(--muted); margin:0; max-width:720px; }
+    .meta { min-width:220px; text-align:right; color:var(--muted); font-size:12px; }
+    .meta strong { display:block; color:var(--ink); font-size:26px; }
+    section { padding:38px 0; border-bottom:1px solid var(--line); }
+    .section-head { display:flex; justify-content:space-between; gap:24px; margin-bottom:22px; }
+    .reference { display:grid; grid-template-columns:220px 1fr; gap:24px; align-items:center; }
+    .reference img { width:100%; display:block; background:#222; }
+    .reference-copy strong { display:block; margin:4px 0 10px; font-size:32px; }
+    .stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:24px; }
+    .stat { border:1px solid var(--line); padding:14px; }
+    .stat strong { display:block; font-size:28px; }
+    .stat span { color:var(--muted); font-size:11px; }
+    .cards { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; }
+    figure { margin:0; min-width:0; }
+    .poster { position:relative; background:#222; overflow:hidden; }
+    .poster img { display:block; width:100%; aspect-ratio:2 / 3; object-fit:cover; }
+    .tag { position:absolute; left:8px; top:8px; padding:3px 6px; background:#151515e8; color:var(--ink); font-size:10px; }
+    figcaption { padding:12px 2px 0; }
+    figcaption strong { display:block; color:var(--green); font-size:12px; }
+    figcaption p { margin-top:4px; font-size:12px; }
+    .findings { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+    .finding { border-left:3px solid var(--blue); padding:12px 14px; background:#1d1d1b; }
+    .finding.warn { border-color:#f1c84b; }
+    .finding strong { display:block; margin-bottom:5px; }
+    code { color:#f1c84b; }
+    @media (max-width:760px) { main{width:min(100% - 24px,560px);padding-top:24px;} header,.section-head{display:block;} .meta{text-align:left;margin-top:18px;} .reference{grid-template-columns:130px 1fr;} .cards{grid-template-columns:repeat(2,minmax(0,1fr));} .findings,.stats{grid-template-columns:1fr;} }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div><div class="kicker">Gig Wall / live regression · 2026-07-10</div><h1>Avatar poster review</h1><p>Four sequential transit generations using one fixed reference avatar. This is a static HTML review artifact, independent of the React app.</p></div>
+    <div class="meta"><strong>4 outputs</strong>one reference · portrait / xerox / Swiss / color-block</div>
+  </header>
+
+  <section>
+    <div class="section-head"><div><div class="kicker">01 / Reference</div><h2>Identity anchor</h2><p>The same synthetic reference is sent as <code>ref_url</code> for every generation.</p></div></div>
+    <div class="reference"><img src="./img/review-generated/identity-test/reference-isaya.png" alt="ISAYA reference avatar"><div class="reference-copy"><div class="kicker">Fixed reference</div><strong>ISAYA</strong><p>Long blue hair · blue eyes · black headphones · subdued expression · black hoodie</p><div class="stats"><div class="stat"><strong>4/4</strong><span>identity recognizable</span></div><div class="stat"><strong>1/4</strong><span>clean name discipline</span></div><div class="stat"><strong>0/4</strong><span>square output from tall ref</span></div></div></div></div>
+  </section>
+
+  <section>
+    <div class="section-head"><div><div class="kicker">02 / Outputs</div><h2>The same person survives all four systems.</h2><p>Identity is much stronger after passing the original avatar image directly to img2img. The cards intentionally preserve their returned 2:3 ratio so the output-shape problem is visible.</p></div></div>
+    <div class="cards">
+      <figure><div class="poster"><img src="./img/review-generated/identity-test/live-portrait.webp" alt="Portrait hazard live output"><span class="tag">PORTRAIT / HAZARD</span></div><figcaption><strong>Identity pass</strong><p>Face, hair, eyes, headphones, and hoodie hold. Lettering is noisy and output is 2:3.</p></figcaption></figure>
+      <figure><div class="poster"><img src="./img/review-generated/identity-test/live-xerox.webp" alt="Xerox live output"><span class="tag">PORTRAIT / XEROX</span></div><figcaption><strong>Strongest identity</strong><p>Most legible face and strongest screenprint feel. ISAYA is fragmented.</p></figcaption></figure>
+      <figure><div class="poster"><img src="./img/review-generated/identity-test/live-silhouette.webp" alt="Swiss silhouette live output"><span class="tag">SILHOUETTE / SWISS</span></div><figcaption><strong>Identity pass</strong><p>Face remains unmistakable, but the large word crosses the eyes.</p></figcaption></figure>
+      <figure><div class="poster"><img src="./img/review-generated/identity-test/live-abstract.webp" alt="Color block live output"><span class="tag">ABSTRACT / COLOR BLOCK</span></div><figcaption><strong>Best balance</strong><p>Experimental color blocks with readable face, hair, headphones, hoodie, and expression.</p></figcaption></figure>
+    </div>
+  </section>
+
+  <section>
+    <div class="kicker">03 / Findings</div><h2>Next constraints to solve</h2>
+    <div class="findings"><div class="finding warn"><strong>Output ratio</strong><p>A 2:3 avatar reference causes img2img to return 2:3 art. The wall contract expects 1:1.</p></div><div class="finding warn"><strong>Type-safe face area</strong><p>Prompt constraints reduce collisions but do not fully prevent oversized type from crossing the eyes.</p></div><div class="finding"><strong>Identity strategy</strong><p>Direct avatar reference works. Color-block and xerox are the best balance of likeness and poster language.</p></div></div>
+  </section>
+</main>
+</body>
+</html>
