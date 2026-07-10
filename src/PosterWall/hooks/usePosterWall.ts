@@ -66,6 +66,7 @@ type PosterPromptMode = 'avatar' | 'username';
 interface PosterPromptTemplate {
   id: string;
   mode: PosterPromptMode | 'both';
+  avatarFidelity?: 'portrait' | 'silhouette' | 'abstract';
   tone: PosterTone;
   concept: string;
   layout: string;
@@ -94,14 +95,14 @@ const POSTER_PROMPT_BASE = [
 
 const AVATAR_IDENTITY_RULE = [
   'Use the reference avatar image and avatar text cue only as the social identity source, not as a scene, object, photo frame, or layout reference.',
-  'Reinterpret broad traits only: face silhouette, hair direction, expression energy, color temperature, accessory hints, and attitude.',
-  'The avatar-derived identity is the main subject of the poster, not a small accent, background texture, or optional side note.',
-  'At least three avatar-derived visual cues must visibly shape the central portrait, emblem, symbol, palette accent, or typographic rhythm.',
-  'The user must be visibly present as a designed performer portrait, symbolic stage icon, personal emblem, or print-culture character integrated into the poster typography.',
-  'A pure typography-only poster is invalid in avatar mode: include a visible non-photographic face, silhouette, mask, performer icon, or identity emblem derived from the avatar.',
-  'Redraw the identity in flat ink, risograph, linocut, halftone, vector, or screenprint language. No photographic skin, no camera lighting, no pasted photo, no circular avatar, no selfie, no photorealistic headshot, and no cute caricature.',
-  'The face or identity mark should occupy the central safe area, then be cropped, overprinted, masked by letters, or reduced into a two-color portrait symbol. It must never appear as a separate photo placed on top of the poster.',
-  'Typography remains the dominant structure even in avatar mode: oversized event text and name-derived type should push across or around the portrait.',
+  'Identity fidelity is more important than the template style: a friend should recognize the same person at first glance.',
+  'Preserve at least three concrete identity anchors from the reference: face shape, hairstyle, eyes and brows, expression, or distinctive accessories.',
+  'The avatar-derived person is the main subject, not a small accent, generic mascot, background texture, monogram, or optional side note.',
+  'Show a recognizable front-facing or three-quarter-view face or upper-body performer portrait occupying roughly 35 to 60 percent of the canvas unless the selected template explicitly requests a silhouette.',
+  'Redraw the same person in flat ink, risograph, linocut, halftone, vector, or screenprint language while retaining recognizable facial structure. No pasted photo, circular avatar, selfie frame, photorealistic skin, or cute caricature.',
+  'Typography may overlap the outer hair, shoulders, or portrait edge, but do not cover the eyes, nose, and mouth recognition area with a large opaque text block.',
+  'A pure typography-only poster or a generic face that could represent any user is invalid in avatar mode.',
+  'Typography must integrate with and frame the portrait; it must not replace or visually overpower the user identity.',
 ].join(' ');
 
 const USERNAME_IDENTITY_RULE = [
@@ -120,6 +121,7 @@ const PROMPT_TEMPLATES: PosterPromptTemplate[] = [
   {
     id: 'hex-zine-portrait',
     mode: 'both',
+    avatarFidelity: 'portrait',
     tone: 'acid',
     concept: 'underground zine night, warning signage, occult diagram marks, xerox grit, serious after-hours energy',
     layout: 'one huge cropped warning word across the middle, a vertical name spine, small astronomy diagrams, safety pictograms, condensed title fragments stacked tightly around the center',
@@ -130,6 +132,7 @@ const PROMPT_TEMPLATES: PosterPromptTemplate[] = [
   {
     id: 'upstairs-handbill',
     mode: 'both',
+    avatarFidelity: 'portrait',
     tone: 'paper',
     concept: 'local underground music and comedy flyer, art-school handbill, casual venue-night charm',
     layout: 'flat paper field, loose marker arrows, one oversized hand-lettered name block, wavy lines pressing into the title, one sitting or leaning performer silhouette, small venue metadata along the edges',
@@ -140,6 +143,7 @@ const PROMPT_TEMPLATES: PosterPromptTemplate[] = [
   {
     id: 'tokyo-pulp-flyer',
     mode: 'both',
+    avatarFidelity: 'portrait',
     tone: 'neon',
     concept: 'Tokyo indie flyer meets board-game insert, snack-packaging energy, funny but mature weirdness',
     layout: 'large expressive central character or mascot-like performer interrupted by cropped package typography, dense side labels, oversized title shapes, screenprint registration texture',
@@ -150,6 +154,7 @@ const PROMPT_TEMPLATES: PosterPromptTemplate[] = [
   {
     id: 'fluoro-notice-bill',
     mode: 'both',
+    avatarFidelity: 'portrait',
     tone: 'neon',
     concept: 'duotone fluorescent notice bill: one colored paper stock plus one single ink color, designed so many different paper colors collide beautifully when stacked on the wall',
     layout: 'full canvas is one uninterrupted solid paper color; every printed element uses the same single ink color only: heavy invented masthead across the top, dot-and-bar registration marks, one rectangular one-ink portrait or illustration window, orderly event information below, and small one-ink stamps at the bottom edge',
@@ -161,26 +166,29 @@ const PROMPT_TEMPLATES: PosterPromptTemplate[] = [
   {
     id: 'subway-showbill',
     mode: 'avatar',
+    avatarFidelity: 'silhouette',
     tone: 'paper',
     concept: 'pure flat graphic-design showbill, neutral grotesk type, subway poster discipline, restrained but bold',
     layout: 'one saturated color field, strict vertical alignment, ticket-rule lines, date block, venue line, one simple sound-wave or arrow symbol, no illustrated scene',
     palette: ['green paper with black and cream type', 'blue paper with black and off-white type', 'warm red paper with black and pale yellow type'],
     typography: ['neutral grotesk headline', 'tight ticket metadata', 'large cropped initials'],
-    identity: 'For avatar mode, reduce avatar cues into a flat two-color portrait symbol or route-sign identity mark that controls the central alignment and type cuts. For username mode, make the name the loud central typographic block.',
+    identity: 'For avatar mode, draw a large recognizable two-color performer silhouette that preserves the reference face contour, hairstyle, eyes, expression, and accessories; route-sign graphics may frame the portrait but must not replace it.',
   },
   {
     id: 'swiss-type-system',
     mode: 'avatar',
+    avatarFidelity: 'silhouette',
     tone: 'paper',
     concept: 'pure Swiss graphic design concert programme, all structure, typography, spacing, and measured tension',
     layout: 'strict asymmetric grid, oversized name block, small venue metadata, thin rule lines, numbered sections, one abstract circle or slash mark, no illustration scene',
     palette: ['off-white, black, and signal red', 'pale grey, black, and cobalt blue', 'butter yellow, black, and one green accent'],
     typography: ['Helvetica-like grotesk typography', 'tight numeric programme labels', 'oversized cropped initials'],
-    identity: 'For avatar mode, translate face contour and hair rhythm into one oversized flat monogram portrait mark, then lock coded metadata to that mark. For username mode, treat the name as the entire poster architecture.',
+    identity: 'For avatar mode, use one oversized recognizable halftone head or bust with preserved face contour, hairstyle, eyes, expression, and accessories; lock the Swiss grid and coded metadata around that portrait instead of replacing it with a monogram.',
   },
   {
     id: 'color-block-program',
     mode: 'avatar',
+    avatarFidelity: 'abstract',
     tone: 'neon',
     concept: 'pure square digital graphic system, bold color blocks, Bauhaus-like stage programme, no representational illustration and no physical object',
     layout: 'large overlapping rectangles and circles printed directly to the canvas edges, one diagonal rule, number column, central name or identity symbol, precise negative space',
@@ -191,6 +199,7 @@ const PROMPT_TEMPLATES: PosterPromptTemplate[] = [
   {
     id: 'fashion-week-roster',
     mode: 'both',
+    avatarFidelity: 'portrait',
     tone: 'neon',
     concept: 'fashion-week schedule poster translated into live-show culture, editorial and high contrast',
     layout: 'overlapping roster blocks, edition number, huge cropped date, vertical name fragments, clean grid with one disruptive symbol and tight microtype at the bottom edge',
@@ -201,6 +210,7 @@ const PROMPT_TEMPLATES: PosterPromptTemplate[] = [
   {
     id: 'museum-comedy-label',
     mode: 'both',
+    avatarFidelity: 'portrait',
     tone: 'acid',
     concept: 'comedy museum signage, backstage labels, wayfinding panels, deadpan institutional humor',
     layout: 'cut-corner sign panels, arrows, room numbers, one bold exhibit-like portrait or name plaque, one oversized cropped punchline word, strong negative space',
@@ -211,6 +221,7 @@ const PROMPT_TEMPLATES: PosterPromptTemplate[] = [
   {
     id: 'xerox-photo-silhouette',
     mode: 'avatar',
+    avatarFidelity: 'portrait',
     tone: 'paper',
     concept: 'photocopied club-night portrait poster, but redrawn as graphic print rather than photo collage',
     layout: 'large monochrome face or bust in the center, rough crop marks, handwritten lineup fragments, broad empty paper areas',
@@ -231,7 +242,12 @@ function pickForSeed<T>(items: T[], seed: string, salt: string): T {
 function promptTemplateFor(mode: PosterPromptMode, seed: string, avoidTemplateId?: string) {
   const pool = PROMPT_TEMPLATES.filter(template => template.mode === mode || template.mode === 'both');
   const contrastPool = avoidTemplateId ? pool.filter(template => template.id !== avoidTemplateId) : pool;
-  return pickForSeed(contrastPool.length ? contrastPool : pool, seed, mode);
+  const available = contrastPool.length ? contrastPool : pool;
+  if (mode !== 'avatar') return pickForSeed(available, seed, mode);
+  const fidelityRoll = seedScore(`${seed}:avatar-fidelity`) % 10;
+  const targetFidelity = fidelityRoll < 7 ? 'portrait' : fidelityRoll < 9 ? 'silhouette' : 'abstract';
+  const fidelityPool = available.filter(template => template.avatarFidelity === targetFidelity);
+  return pickForSeed(fidelityPool.length ? fidelityPool : available, seed, `${mode}:${targetFidelity}`);
 }
 
 function cueList(items: string[] | undefined, limit: number) {
@@ -244,19 +260,19 @@ function cueList(items: string[] | undefined, limit: number) {
 
 function avatarCueLine(result?: RecognizeResult | null) {
   if (!result) {
-    return 'Avatar text cue: recognition was unavailable. Use the user name as the main social identity and invent a mature flat performer mark that still feels personal, not generic.';
+    return 'Avatar text cue: recognition was unavailable, but the reference avatar image remains authoritative. Preserve the same recognizable face, hairstyle, expression, and distinctive accessories from the reference; do not invent a replacement performer.';
   }
   const caption = result.caption?.replace(/[{}<>"'`]/g, '').replace(/\s+/g, ' ').trim().slice(0, 160);
   const labels = cueList(result.labels, 8);
   const attributes = cueList(result.attributes, 8);
   const parts = cueList(result.parts, 8);
   return [
-    'Avatar text cue from visual recognition only; do not paste or reconstruct the source photo.',
+    'Avatar text cue supplements the reference image; preserve the same person rather than inventing a new generic performer.',
     caption ? `Caption: ${caption}.` : '',
     labels.length ? `Visual labels: ${labels.join(', ')}.` : '',
     attributes.length ? `Graphic traits: ${attributes.join(', ')}.` : '',
     parts.length ? `Useful parts: ${parts.join(', ')}.` : '',
-    'Use at least three of these cues as design direction for the central silhouette, hair/shape rhythm, expression energy, color temperature, accessory hints, and stage attitude. Do not make demographic claims.',
+    'Use these cues to reinforce at least three visible identity anchors in the portrait: face contour, hairstyle, eyes and brows, expression, or distinctive accessories. Do not make demographic claims.',
   ].filter(Boolean).join(' ');
 }
 
@@ -264,8 +280,9 @@ function avatarIdentityPriorityLine(userName?: string) {
   const clean = (userName || 'YOU').replace(/[{}<>"'`]/g, '').replace(/\s+/g, ' ').trim().slice(0, 24) || 'YOU';
   return [
     'The template supplies print language only; the avatar-derived identity must decide the poster subject.',
-    'Make the central identity form large enough that a viewer can tell this is a personal poster even when the wall view stacks it as a smaller square card.',
-    'Reflect the avatar cues in at least two different design layers: the main portrait or emblem, the supporting symbol or illustration, the accent palette, the crop shape, or the type rhythm.',
+    'Make the recognizable face or upper-body portrait occupy roughly 35 to 60 percent of the canvas so it remains personal in the smaller stacked wall view.',
+    'Preserve the same face shape, hairstyle, eyes and brows, expression, and distinctive accessories wherever visible in the reference; do not substitute a generic face.',
+    'Keep the eyes, nose, and mouth readable. Type may cross the hair, shoulder, or outer silhouette, but not erase the central facial recognition area.',
     `The name "${clean}" must appear as part of the poster design, woven through the identity mark as cropped letters, stage-title fragments, or vertical type rather than a plain author credit.`,
     'Do not produce a generic event flyer that would look the same for another user.',
   ].join(' ');
