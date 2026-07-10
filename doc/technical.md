@@ -14,11 +14,12 @@
 - `src/PosterWall/PosterWall.less`：真实游戏的深黑背景、地铁路线圆点、Helvetica 导视排版、海报叠放布局、整齐排列布局、680ms 布局切换动画、生成入口、空墙、等待页、详情页和社交区样式。
 - `src/PosterWall/hooks/usePosterWall.ts`：用户资料、图像生成、本地 mirror 存档、3 小时生成冷却、公共墙拉取、点赞/留言聚合、留言通知、optimistic merge。
 - `src/PosterWall/types.ts`：`PosterEntry`、`PosterSave`、`WallEntry`、舞台尺寸和评审页生成样张路径。
-- `src/PosterWall/ReviewPage.tsx` / `ReviewPage.less`：评审页，展示最终首屏、详情页、生成目标样张和关键状态。
+- `src/PosterWall/ReviewPage.tsx` / `ReviewPage.less`：评审页，展示身份保真打样台、最终首屏、详情页、生成目标样张和关键状态；身份打样台用同一固定参考图对比 4 张 transit 真实输出，并记录身份、名字和比例问题。
 - `src/PosterWall/i18n/index.ts`：英文单语文案表，保留 `t()` 占位符替换但不再根据浏览器语言切换。
 - `src/PosterWall/utils/sounds.ts`：Web Audio 合成点击、生成、成功、失败、打开详情音效。
 - `src/shared/social/guestbook.ts`：共享留言模型和工具，提供 `GuestMessage`、`appendMessage()`、`messagesByTarget()`、`threadFor()`、`guestbookNotifyConfig()`、`timeAgo()`。
-- `public/img/review-generated/*.jpg` 与 `public/img/review-generated/templates/*.jpg`：评审页生成方向样张；正式墙面不使用这些图片打底。
+- `public/img/review-generated/*.jpg`、`public/img/review-generated/templates/*.jpg` 与 `public/img/review-generated/identity-test/live-*.webp`：评审页生成方向样张和 2026-07-10 头像保真回归实测结果；正式墙面不使用这些图片打底。
+- `public/img/review-generated/identity-test/reference-isaya.png` 与 `identity-test/*.webp`：固定角色参考图和 4 张 transit 身份保真测试输出，只进入评审页，不进入正式作品墙或玩家存档。
 - `public/img/style-ref/fluoro-notice-ref.png` / `.svg`：`fluoro-notice-bill` 模板的彩色纸 + 单色油墨参考资产；只有部署到 HTTPS 后才会作为 `ref_url` 传给平台生图接口。
 - `public/poster.png` / `public/poster.svg`：当前平台封面，发布时也需要同步到 `games/posters/poster-wall.png`。
 

@@ -29,6 +29,41 @@ const templateSamples = [
   { id: 'xerox-photo-silhouette', mode: 'avatar cue', src: './img/review-generated/templates/xerox-photo-silhouette.jpg' },
 ];
 
+const identityTests = [
+  {
+    id: 'portrait-hazard',
+    tier: 'Portrait / hazard',
+    src: './img/review-generated/identity-test/live-portrait.webp',
+    verdict: 'Identity pass',
+    note: 'Face, hair, eyes, headphones, and hoodie hold. The result is clearly the same person; generated lettering is noisy and the tall 2:3 output is not square.',
+    status: 'warn',
+  },
+  {
+    id: 'portrait-pulp',
+    tier: 'Portrait / pulp',
+    src: './img/review-generated/identity-test/live-xerox.webp',
+    verdict: 'Strongest identity',
+    note: 'Most legible face and strongest screenprint feel. ISAYA is fragmented and the image follows the reference portrait ratio.',
+    status: 'warn',
+  },
+  {
+    id: 'silhouette-swiss',
+    tier: 'Silhouette / Swiss',
+    src: './img/review-generated/identity-test/live-silhouette.webp',
+    verdict: 'Identity pass',
+    note: 'The face and headphones remain unmistakable, but the large ISAYA word crosses the eyes. Keep type around the face in the next prompt.',
+    status: 'warn',
+  },
+  {
+    id: 'abstract-colorblock',
+    tier: 'Abstract / color block',
+    src: './img/review-generated/identity-test/live-abstract.webp',
+    verdict: 'Best balance',
+    note: 'Color blocks stay experimental while the face, hair, headphones, hoodie, and expression remain readable. Name repeats, but does not cover the face.',
+    status: 'pass',
+  },
+] as const;
+
 function posterStyle(index: number): CSSProperties {
   return {
     '--poster-img': `url(${new URL(REVIEW_POSTER_IMAGES[index % REVIEW_POSTER_IMAGES.length], document.baseURI).href})`,
@@ -275,6 +310,42 @@ export default function ReviewPage() {
           </article>
         ))}
       </section>
+
+      <Section
+        kicker="Identity proof / live generation"
+        title="The same person survives all four poster systems."
+        body="Four sequential transit generations use one fixed reference. Identity holds across portrait, xerox, Swiss, and color-block systems; the review still flags the 2:3 output ratio and typography collisions for the next pass."
+      >
+        <div className="pwr-identity-proof">
+          <aside className="pwr-identity-proof__reference">
+            <div>
+              <span>Fixed reference</span>
+              <strong>ISAYA</strong>
+              <p>Long blue hair · blue eyes · black headphones · subdued expression · black hoodie</p>
+            </div>
+            <img src="./img/review-generated/identity-test/reference-isaya.png" alt="ISAYA identity test reference" draggable={false} />
+          </aside>
+          <div className="pwr-identity-proof__summary">
+            <article><strong>4/4</strong><span>Identity recognizable</span></article>
+            <article><strong>1/4</strong><span>Clean name discipline</span></article>
+            <article><strong>0/4</strong><span>Square output from tall ref</span></article>
+          </div>
+          <div className="pwr-identity-proof__grid">
+            {identityTests.map(test => (
+              <figure key={test.id} className={`is-${test.status}`}>
+                <div className="pwr-identity-proof__image">
+                  <img src={test.src} alt={`${test.tier} identity test output`} draggable={false} />
+                  <span>{test.tier}</span>
+                </div>
+                <figcaption>
+                  <strong>{test.verdict}</strong>
+                  <p>{test.note}</p>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
+      </Section>
 
       <Section
         kicker="Wall"
