@@ -15,6 +15,7 @@
 - `src/PosterWall/hooks/usePosterWall.ts`：用户资料、图像生成、本地 mirror 存档、3 小时生成冷却、公共墙拉取、点赞/留言聚合、留言通知、optimistic merge。
 - `src/PosterWall/types.ts`：`PosterEntry`、`PosterSave`、`WallEntry`、舞台尺寸和评审页生成样张路径。
 - `src/PosterWall/ReviewPage.tsx` / `ReviewPage.less`：评审页，展示身份保真打样台、最终首屏、详情页、生成目标样张和关键状态；身份打样台用同一固定参考图对比 4 张 transit 真实输出，并记录身份、名字和比例问题。
+- `public/review.html`：不依赖 React 的独立静态 HTML 评审页，使用相对路径展示固定参考头像、4 张真实回归海报、统计数字和下一轮问题；构建后可直接打开 `/poster-wall/review.html`。
 - `src/PosterWall/i18n/index.ts`：英文单语文案表，保留 `t()` 占位符替换但不再根据浏览器语言切换。
 - `src/PosterWall/utils/sounds.ts`：Web Audio 合成点击、生成、成功、失败、打开详情音效。
 - `src/shared/social/guestbook.ts`：共享留言模型和工具，提供 `GuestMessage`、`appendMessage()`、`messagesByTarget()`、`threadFor()`、`guestbookNotifyConfig()`、`timeAgo()`。
