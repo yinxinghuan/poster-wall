@@ -21,6 +21,7 @@
 - `src/shared/social/guestbook.ts`：共享留言模型和工具，提供 `GuestMessage`、`appendMessage()`、`messagesByTarget()`、`threadFor()`、`guestbookNotifyConfig()`、`timeAgo()`。
 - `public/img/review-generated/*.jpg`、`public/img/review-generated/templates/*.jpg` 与 `public/img/review-generated/identity-test/live-*.webp`：评审页生成方向样张和 2026-07-10 头像保真回归实测结果；正式墙面不使用这些图片打底。
 - `public/img/review-generated/identity-test/reference-isaya.png` 与 `identity-test/*.webp`：固定角色参考图和 4 张 transit 身份保真测试输出，只进入评审页，不进入正式作品墙或玩家存档。
+- 回归结论（2026-07-10）：平台用户头像是 1:1，当前墙面和详情页保持方形契约；评审夹具 `reference-isaya.png` 是 832×1248 的旧竖图，导致 4 张测试输出为 2:3，这只是夹具比例观察，不是生产 bug。四张输出均可辨认同一人物，其中 color-block 与 xerox 方向的身份/海报平衡最好；Swiss 方向仍需避免大标题穿过眼睛。
 - `public/img/style-ref/fluoro-notice-ref.png` / `.svg`：`fluoro-notice-bill` 模板的彩色纸 + 单色油墨参考资产；只有部署到 HTTPS 后才会作为 `ref_url` 传给平台生图接口。
 - `public/poster.png` / `public/poster.svg`：当前平台封面，发布时也需要同步到 `games/posters/poster-wall.png`。
 
