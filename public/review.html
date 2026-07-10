@@ -50,13 +50,13 @@
 
   <section>
     <div class="section-head"><div><div class="kicker">01 / Reference</div><h2>Identity anchor</h2><p>The same synthetic reference is sent as <code>ref_url</code> for every generation.</p></div></div>
-    <div class="reference"><img src="./img/review-generated/identity-test/reference-isaya.png" alt="ISAYA reference avatar"><div class="reference-copy"><div class="kicker">Fixed reference</div><strong>ISAYA</strong><p>Long blue hair · blue eyes · black headphones · subdued expression · black hoodie</p><div class="stats"><div class="stat"><strong>4/4</strong><span>identity recognizable</span></div><div class="stat"><strong>1/4</strong><span>clean name discipline</span></div><div class="stat"><strong>0/4</strong><span>square output from tall ref</span></div></div></div></div>
+    <div class="reference"><img src="./img/review-generated/identity-test/reference-isaya.png" alt="ISAYA reference avatar"><div class="reference-copy"><div class="kicker">Fixed test fixture</div><strong>ISAYA</strong><p>Long blue hair · blue eyes · black headphones · subdued expression · black hoodie</p><div class="stats"><div class="stat"><strong>4/4</strong><span>identity recognizable</span></div><div class="stat"><strong>1/4</strong><span>clean name discipline</span></div><div class="stat"><strong>832×1248</strong><span>test fixture ratio</span></div></div></div></div>
   </section>
 
   <section>
-    <div class="section-head"><div><div class="kicker">02 / Outputs</div><h2>The same person survives all four systems.</h2><p>Identity is much stronger after passing the original avatar image directly to img2img. The cards intentionally preserve their returned 2:3 ratio so the output-shape problem is visible.</p></div></div>
+    <div class="section-head"><div><div class="kicker">02 / Outputs</div><h2>The same person survives all four systems.</h2><p>Identity is much stronger after passing the original avatar image directly to img2img. These outputs inherit the 2:3 ratio of this old test fixture; platform user avatars are 1:1, so this is not a platform-ratio failure.</p></div></div>
     <div class="cards">
-      <figure><div class="poster"><img src="./img/review-generated/identity-test/live-portrait.webp" alt="Portrait hazard live output"><span class="tag">PORTRAIT / HAZARD</span></div><figcaption><strong>Identity pass</strong><p>Face, hair, eyes, headphones, and hoodie hold. Lettering is noisy and output is 2:3.</p></figcaption></figure>
+      <figure><div class="poster"><img src="./img/review-generated/identity-test/live-portrait.webp" alt="Portrait hazard live output"><span class="tag">PORTRAIT / HAZARD</span></div><figcaption><strong>Identity pass</strong><p>Face, hair, eyes, headphones, and hoodie hold. Lettering is noisy; ratio follows the old fixture.</p></figcaption></figure>
       <figure><div class="poster"><img src="./img/review-generated/identity-test/live-xerox.webp" alt="Xerox live output"><span class="tag">PORTRAIT / XEROX</span></div><figcaption><strong>Strongest identity</strong><p>Most legible face and strongest screenprint feel. ISAYA is fragmented.</p></figcaption></figure>
       <figure><div class="poster"><img src="./img/review-generated/identity-test/live-silhouette.webp" alt="Swiss silhouette live output"><span class="tag">SILHOUETTE / SWISS</span></div><figcaption><strong>Identity pass</strong><p>Face remains unmistakable, but the large word crosses the eyes.</p></figcaption></figure>
       <figure><div class="poster"><img src="./img/review-generated/identity-test/live-abstract.webp" alt="Color block live output"><span class="tag">ABSTRACT / COLOR BLOCK</span></div><figcaption><strong>Best balance</strong><p>Experimental color blocks with readable face, hair, headphones, hoodie, and expression.</p></figcaption></figure>
@@ -65,7 +65,7 @@
 
   <section>
     <div class="kicker">03 / Findings</div><h2>Next constraints to solve</h2>
-    <div class="findings"><div class="finding warn"><strong>Output ratio</strong><p>A 2:3 avatar reference causes img2img to return 2:3 art. The wall contract expects 1:1.</p></div><div class="finding warn"><strong>Type-safe face area</strong><p>Prompt constraints reduce collisions but do not fully prevent oversized type from crossing the eyes.</p></div><div class="finding"><strong>Identity strategy</strong><p>Direct avatar reference works. Color-block and xerox are the best balance of likeness and poster language.</p></div></div>
+    <div class="findings"><div class="finding"><strong>Fixture note</strong><p>This archived test reference is 832×1248. Real platform avatars are 1:1, so these 2:3 outputs are not evidence of a production ratio bug.</p></div><div class="finding warn"><strong>Type-safe face area</strong><p>Prompt constraints reduce collisions but do not fully prevent oversized type from crossing the eyes.</p></div><div class="finding"><strong>Identity strategy</strong><p>Direct avatar reference works. Color-block and xerox are the best balance of likeness and poster language.</p></div></div>
   </section>
 </main>
 </body>

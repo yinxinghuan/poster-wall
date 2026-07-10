@@ -35,7 +35,7 @@ const identityTests = [
     tier: 'Portrait / hazard',
     src: './img/review-generated/identity-test/live-portrait.webp',
     verdict: 'Identity pass',
-    note: 'Face, hair, eyes, headphones, and hoodie hold. The result is clearly the same person; generated lettering is noisy and the tall 2:3 output is not square.',
+    note: 'Face, hair, eyes, headphones, and hoodie hold. Generated lettering is noisy; the tall ratio belongs to this archived test fixture.',
     status: 'warn',
   },
   {
@@ -43,7 +43,7 @@ const identityTests = [
     tier: 'Portrait / pulp',
     src: './img/review-generated/identity-test/live-xerox.webp',
     verdict: 'Strongest identity',
-    note: 'Most legible face and strongest screenprint feel. ISAYA is fragmented and the image follows the reference portrait ratio.',
+    note: 'Most legible face and strongest screenprint feel. ISAYA is fragmented; the image follows the archived fixture ratio.',
     status: 'warn',
   },
   {
@@ -314,7 +314,7 @@ export default function ReviewPage() {
       <Section
         kicker="Identity proof / live generation"
         title="The same person survives all four poster systems."
-        body="Four sequential transit generations use one fixed reference. Identity holds across portrait, xerox, Swiss, and color-block systems; the review still flags the 2:3 output ratio and typography collisions for the next pass."
+        body="Four sequential transit generations use one fixed reference. Identity holds across portrait, xerox, Swiss, and color-block systems; the only real next-pass issue is typography colliding with the face. The 2:3 result belongs to this archived test fixture; platform avatars are 1:1."
       >
         <div className="pwr-identity-proof">
           <aside className="pwr-identity-proof__reference">
@@ -328,7 +328,7 @@ export default function ReviewPage() {
           <div className="pwr-identity-proof__summary">
             <article><strong>4/4</strong><span>Identity recognizable</span></article>
             <article><strong>1/4</strong><span>Clean name discipline</span></article>
-            <article><strong>0/4</strong><span>Square output from tall ref</span></article>
+            <article><strong>1:1</strong><span>Platform avatar contract</span></article>
           </div>
           <div className="pwr-identity-proof__grid">
             {identityTests.map(test => (
