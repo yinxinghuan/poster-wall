@@ -40,7 +40,7 @@ const CRAFT_COOLDOWN_MS = 3 * 60 * 60 * 1000;
 
 const DEFAULT_SAVE: PosterSave = { posters: [], totalGenerated: 0 };
 
-function nameGraphicLine(userName?: string) {
+function nameGraphicLine(userName?: string, templateId?: string) {
   const clean = (userName || 'YOU').replace(/[{}<>"'`]/g, '').replace(/\s+/g, ' ').trim().slice(0, 24) || 'YOU';
   const displayName = clean.toUpperCase();
   const initials = clean
@@ -50,15 +50,13 @@ function nameGraphicLine(userName?: string) {
     .slice(0, 4)
     .toUpperCase() || displayName.slice(0, 4);
   const exactName = displayName.length > 18 ? displayName.slice(0, 18).trim() : displayName;
-  return [
-    `Required user-name material: "${clean}".`,
-    `Mandatory exact-name text: the poster must contain one readable instance of "${exactName}" spelled exactly, preferably as the performer name, show title, or vertical title spine.`,
-    `Do not satisfy the name requirement with initials only, lookalike random letters, misspelled variants, or fake words. Initials "${initials}" may appear only as secondary ornament.`,
-    `Readable text tokens may include "${exactName}", "${exactName} LIVE", "${exactName} 22:00", "${initials} ROOM", "ROOM 05", "FRI 22", "SIDE A", and "EDITION 07".`,
-    'Treat the name as graphic raw material, never as a plain signature: oversized cropped letters, initials, sideways type, venue arrows, edition numbers, access-code labels, show-title fragments, or half-readable decorative typography.',
-    'The exact readable name can be integrated into a major composition mass, but one instance must remain legible while other name-derived letters may be cropped by the canvas edge, rotated vertically, or colliding with a date or venue block.',
-    'Keep name-derived typography in the center third of the poster so the stacked wall view still shows a recognizable trace.',
-  ].join(' ');
+  if (templateId === 'swiss-type-system') {
+    return `Set the exact performer name "${exactName}" once inside the small top-left information label, at the same restrained size as "LIVE · FRI 22 · 22:00".`;
+  }
+  if (templateId === 'xerox-photo-silhouette') {
+    return `Stamp the exact performer name "${exactName}" once in the small top-right corner, directly above the same-size line "LIVE · FRI 22 · 22:00".`;
+  }
+  return `Print the exact performer name "${exactName}" once, clearly spelled and readable. Initials "${initials}" may appear only as a small secondary mark. The only supporting text is "LIVE · FRI 22 · 22:00".`;
 }
 
 type PosterPromptMode = 'avatar' | 'username';
@@ -77,44 +75,18 @@ interface PosterPromptTemplate {
 }
 
 const POSTER_PROMPT_BASE = [
-  'Create one full-frame flat 2D vector typography artwork, like an exported Illustrator/SVG/risograph graphic design file.',
-  'The entire image is only colored ink shapes, typography, symbols, portrait marks, print grain, registration texture, and flat color blocks on one digital canvas.',
-  'Use the whole square output canvas as one square gig poster, showbill, or flyer artwork. Color fields and type must touch all four image edges. Do not create a smaller rectangle floating inside unused space.',
-  'Use a flat orthographic front-view square composition. Do not make a photo. Only a flat graphic composition. No realistic lighting, no scene, no object, no perspective.',
-  'Fill the output edge-to-edge with the design itself, using solid background color fields and internal typography instead of surrounding space.',
-  'Keep all important identity marks, face cues, title mass, name-derived typography, and symbols inside the square artwork; the app displays the generated image as a square card without vertical cropping.',
-  'Use high typographic tension: oversized cropped headline letters bleeding off the canvas, vertical type spines, diagonal cuts, compressed side labels, strong scale contrast, and asymmetrical negative space.',
-  'Typography must drive the composition, not decorate it. Use three clear text scales: one huge cropped word or name fragment dominating about half the canvas, one medium event line or date block, and a few tiny venue/catalog notes.',
-  'Avoid calm centered layouts, equal margins, evenly spaced blocks, and polite poster templates. Create pressure by making type touch edges, collide with rules, run vertically, stack tightly, or cut through color fields.',
-  'The design cannot be wordless. Include visible fictional English show information such as title, venue, date, time, edition number, door note, side label, or lineup fragments.',
-  'For better spelling, print only short English words and short numeric labels. Avoid long paragraphs, fake body copy, and dense unreadable microtext.',
-  'Use fictional English venue and show text only. Text may be cropped, stacked, vertical, or hand-lettered, but the largest visible words should be readable.',
-  'Make it feel like mature print culture: gig flyer, showbill, zine poster, venue placard, indie event poster, Swiss programme, or risograph screenprint.',
-  'No app UI, no social-media story UI, no QR code, no external brand logo, no Aigram logo, no skateboard, no wheels, no wanted-poster trope, no childish cartoon.',
+  'Create one square, front-view, edge-to-edge 2D graphic artwork that fills every pixel of the canvas.',
+  'The background ink field reaches all four image edges; the canvas edge itself is the artwork edge.',
+  'Show only the template artwork: its performer identity, permitted lettering, ink marks, and listed graphic motifs. Every visible element must belong to that closed list.',
 ].join(' ');
 
 const AVATAR_IDENTITY_RULE = [
-  'Use the reference avatar image and avatar text cue only as the social identity source, not as a scene, object, photo frame, or layout reference.',
-  'Identity fidelity is more important than the template style: a friend should recognize the same person at first glance.',
-  'Preserve at least three concrete identity anchors from the reference: face shape, hairstyle, eyes and brows, expression, or distinctive accessories.',
-  'The avatar-derived person is the main subject, not a small accent, generic mascot, background texture, monogram, or optional side note.',
-  'Show a recognizable front-facing or three-quarter-view face or upper-body performer portrait occupying roughly 35 to 60 percent of the canvas unless the selected template explicitly requests a silhouette.',
-  'Redraw the same person in flat ink, risograph, linocut, halftone, vector, or screenprint language while retaining recognizable facial structure. No pasted photo, circular avatar, selfie frame, photorealistic skin, or cute caricature.',
-  'Typography may overlap the outer hair, shoulders, or portrait edge, but do not cover the eyes, nose, and mouth recognition area with a large opaque text block.',
-  'A pure typography-only poster or a generic face that could represent any user is invalid in avatar mode.',
-  'Typography must integrate with and frame the portrait; it must not replace or visually overpower the user identity.',
+  'Redraw the same person from the reference as the performer. Preserve face shape, hairstyle, expression, and distinctive accessories; keep eyes, nose, and mouth unobscured.',
+  'Translate the person into the selected print technique while keeping the face recognizable.',
 ].join(' ');
 
 const USERNAME_IDENTITY_RULE = [
-  'There is no avatar. Use the user name as the social identity source.',
-  'This is a pure text-to-image generation path: no reference image, no avatar image, no physical poster mockup, and no photographed scene.',
-  'Do not copy any old cached reference words such as BACK, ROOM, TONIGHT, SIDE A, LIVE, FRI, EAST STAGE, POSTER WALL, NOISE, LATE, SHIFT, ECHO, SIDE B, ROOM 14, NORTH LINE, or TYPE SHOULD FEEL TOO LARGE.',
-  'Create a new typographic composition from the current user name and fictional show information; invent the main axis, crop points, color placement, and text positions.',
-  'Turn the name into the main 2D graphic: large cropped letters, initials, vertical fragments, ticket-code typography, venue stamp, hand-lettered stage name, or half-readable title mass.',
-  'The typographic layout should feel tense and designed: one oversized name/title element should push beyond the canvas edge, while smaller date and venue details lock around it. The largest type should feel almost too big for the poster.',
-  'Generate your own fictional English show title, room label, date, time, edition number, and small venue notes as part of the poster.',
-  'The name should feel integrated into the design, not placed as a plain signature.',
-  'All lettering must sit directly on the flat design canvas, never on a photographed sheet, wall, signboard, or framed object.',
+  'There is no avatar. Make the current performer name the identity anchor and the only large text in this flat graphic.',
 ].join(' ');
 
 const PROMPT_TEMPLATES: PosterPromptTemplate[] = [
@@ -123,33 +95,33 @@ const PROMPT_TEMPLATES: PosterPromptTemplate[] = [
     mode: 'both',
     avatarFidelity: 'portrait',
     tone: 'acid',
-    concept: 'underground zine night, warning signage, occult diagram marks, xerox grit, serious after-hours energy',
-    layout: 'one huge cropped warning word across the middle, a vertical name spine, small astronomy diagrams, safety pictograms, condensed title fragments stacked tightly around the center',
+    concept: 'a raw two-ink photocopied occult-zine cover with hand-cut collage energy',
+    layout: 'one irregular central portrait or hand-cut name collage surrounded by tiny hand-drawn stars, arrows, stamps, and torn xerox fragments; use a loose radial composition with large areas of exposed paper',
     palette: ['acid yellow and deep black only', 'safety orange and black with dirty cream ink', 'black paper with sulfur yellow ink'],
     typography: ['rough condensed block type', 'stamped hazard labels', 'cropped all-night show codes'],
-    identity: 'For avatar mode, build the poster around a central engraved performer head derived from avatar cues; warning diagrams and type must orbit, slice, or mask that head. For username mode, turn the name into a hazard-label title and warning-code fragments.',
+    identity: 'Allowed elements only: one hand-cut identity collage, rough stamped letters, tiny stars, arrows, ink smudges, and torn copier fragments. Use exactly two ink colors and an irregular radial arrangement.',
   },
   {
     id: 'upstairs-handbill',
     mode: 'both',
     avatarFidelity: 'portrait',
     tone: 'paper',
-    concept: 'local underground music and comedy flyer, art-school handbill, casual venue-night charm',
-    layout: 'flat paper field, loose marker arrows, one oversized hand-lettered name block, wavy lines pressing into the title, one sitting or leaning performer silhouette, small venue metadata along the edges',
+    concept: 'a one-night local venue handbill drawn quickly with marker, brush, and cheap one-color duplicator ink',
+    layout: 'the colored paper field reaches all four canvas edges; one off-center hand-drawn performer or name, loose handwritten lines, a crooked venue stamp, and two or three small doodles float in open paper',
     palette: ['pastel cyan, red, cream, and black', 'soft yellow paper with red marker and black ink', 'dusty pink paper with green and black ink'],
     typography: ['hand-lettered headline', 'marker arrows', 'imperfect small event notes'],
-    identity: 'For avatar mode, make the main performer silhouette inherit avatar face contour, hair rhythm, expression energy, and attitude cues; arrows and venue notes should press around that figure. For username mode, turn the name into messy stage lettering across the central third.',
+    identity: 'Allowed elements only: one loose marker identity, the performer name, one crooked venue stamp, two tiny doodles, and three handwritten event tokens. Use one paper color and at most two loose ink colors; leave at least 30 percent open paper.',
   },
   {
     id: 'tokyo-pulp-flyer',
     mode: 'both',
     avatarFidelity: 'portrait',
     tone: 'neon',
-    concept: 'Tokyo indie flyer meets board-game insert, snack-packaging energy, funny but mature weirdness',
-    layout: 'large expressive central character or mascot-like performer interrupted by cropped package typography, dense side labels, oversized title shapes, screenprint registration texture',
+    concept: 'a vivid Tokyo indie pulp flyer with a strange central performer illustration and playful snack-wrapper lettering',
+    layout: 'a saturated background reaches all four canvas edges; one large expressive illustrated performer fills the center while curved wrapper ribbons, starbursts, speech-bubble shapes, and small package labels orbit the figure in an energetic asymmetric swirl',
     palette: ['saturated red, teal, pink, cream, and black', 'cobalt blue, hot pink, rice paper, and ink black', 'tomato red, mint green, pale blue, and black'],
     typography: ['distorted hand-painted Latin letters', 'kana-like Latin fragments', 'small fake catalog stamps'],
-    identity: 'For avatar mode, derive the central face, costume attitude, and mascot-like performer energy from avatar cues, then let packaging typography wrap around or interrupt it. For username mode, make the name huge, playful, and cropped like packaging typography.',
+    identity: 'Allowed elements only: one central singer illustration, the exact performer name, rounded hand-painted lettering, curved wrapper ribbons, three starbursts, and two tiny fictional snack-label shapes. The singer occupies 55 percent of the canvas and the name occupies at most 16 percent of the canvas height.',
   },
   {
     id: 'fluoro-notice-bill',
@@ -160,7 +132,7 @@ const PROMPT_TEMPLATES: PosterPromptTemplate[] = [
     layout: 'full canvas is one uninterrupted solid paper color; every printed element uses the same single ink color only: heavy invented masthead across the top, dot-and-bar registration marks, one rectangular one-ink portrait or illustration window, orderly event information below, and small one-ink stamps at the bottom edge',
     palette: ['fluorescent orange paper plus black ink only', 'fluorescent green paper plus black ink only', 'cyan paper plus black ink only', 'hot pink paper plus black ink only', 'warm butter paper plus black ink only'],
     typography: ['chunky rounded grotesk masthead with dot accents', 'typewriter-like italic subhead', 'condensed black event metadata'],
-    identity: 'Strict duotone rule: exactly one background paper color and exactly one ink color. No third color, no gradients, no colored illustration, no multicolor type, no shadows, no lighting. Do not copy the real word CESURE or any real event logo. Invent a short fictional masthead. For avatar mode, the one-ink portrait or icon window is the main subject and must translate avatar hair, face contour, accessory hints, or expression energy into a personal notice-bill mark. For username mode, make the user name the secondary event title or performer line, not a signature.',
+    identity: 'Allowed elements only: one uninterrupted fluorescent paper field, one single ink color, one rectangular identity window, one chunky invented masthead, dot-and-bar registration marks, and three short event lines. Every printed pixel uses the same ink color; flat duotone printing defines the whole image.',
     refAsset: './img/style-ref/fluoro-notice-ref.png',
   },
   {
@@ -168,66 +140,66 @@ const PROMPT_TEMPLATES: PosterPromptTemplate[] = [
     mode: 'avatar',
     avatarFidelity: 'silhouette',
     tone: 'paper',
-    concept: 'pure flat graphic-design showbill, neutral grotesk type, subway poster discipline, restrained but bold',
-    layout: 'one saturated color field, strict vertical alignment, ticket-rule lines, date block, venue line, one simple sound-wave or arrow symbol, no illustrated scene',
+    concept: 'a flat metropolitan route showbill with one bold silhouette and disciplined transit-sign alignment',
+    layout: 'one saturated background reaches all four edges; one recognizable two-color head-and-shoulders silhouette sits on the left while three horizontal route lines, one arrow, and a compact date block align on the right',
     palette: ['green paper with black and cream type', 'blue paper with black and off-white type', 'warm red paper with black and pale yellow type'],
     typography: ['neutral grotesk headline', 'tight ticket metadata', 'large cropped initials'],
-    identity: 'For avatar mode, draw a large recognizable two-color performer silhouette that preserves the reference face contour, hairstyle, eyes, expression, and accessories; route-sign graphics may frame the portrait but must not replace it.',
+    identity: 'Allowed elements only: exactly one two-color performer silhouette, three route lines, one arrow, the exact performer name, and LIVE · FRI 22 · 22:00. The silhouette occupies 55 percent and the route information occupies the remaining narrow column.',
   },
   {
     id: 'swiss-type-system',
     mode: 'avatar',
     avatarFidelity: 'silhouette',
     tone: 'paper',
-    concept: 'pure Swiss graphic design concert programme, all structure, typography, spacing, and measured tension',
-    layout: 'strict asymmetric grid, oversized name block, small venue metadata, thin rule lines, numbered sections, one abstract circle or slash mark, no illustration scene',
+    concept: 'a restrained 1960s Swiss concert programme built from measured typography, calm spacing, and one precise geometric signal',
+    layout: 'use a strict six-column grid with one small portrait or identity mark occupying at most one third; keep at least 40 percent quiet negative space, align a modest performer name, date, venue, and section numbers to thin rules',
     palette: ['off-white, black, and signal red', 'pale grey, black, and cobalt blue', 'butter yellow, black, and one green accent'],
-    typography: ['Helvetica-like grotesk typography', 'tight numeric programme labels', 'oversized cropped initials'],
-    identity: 'For avatar mode, use one oversized recognizable halftone head or bust with preserved face contour, hairstyle, eyes, expression, and accessories; lock the Swiss grid and coded metadata around that portrait instead of replacing it with a monogram.',
+    typography: ['restrained Helvetica-like labels', 'small tabular programme numerals', 'modest exact-name information label'],
+    identity: 'Allowed elements only: exactly one identity depiction as a rectangular halftone head-and-shoulders crop, six thin rules, section numerals 01–04, and a small top-left information label. Quiet empty space occupies at least 40 percent.',
   },
   {
     id: 'color-block-program',
     mode: 'avatar',
     avatarFidelity: 'abstract',
     tone: 'neon',
-    concept: 'pure square digital graphic system, bold color blocks, Bauhaus-like stage programme, no representational illustration and no physical object',
-    layout: 'large overlapping rectangles and circles printed directly to the canvas edges, one diagonal rule, number column, central name or identity symbol, precise negative space',
+    concept: 'an abstract Bauhaus stage programme that translates personal avatar traits into a geometric emblem',
+    layout: 'three large overlapping geometric shapes touch the canvas edges; a single central emblem derived from hair direction and face contour sits beside one vertical number column and one thin rule',
     palette: ['red, yellow, blue, black, and cream', 'cyan, magenta, black, and white', 'emerald, orange, cream, and black'],
     typography: ['large grotesk letters locked to color blocks', 'tiny serial numbers', 'simple programme captions'],
-    identity: 'For avatar mode, let face contour, hair direction, expression energy, and accessory hints determine the central abstract flat shapes, two-color emblem, and color-block geometry. For username mode, let the name break across the color blocks as a graphic object.',
+    identity: 'Allowed elements only: three overlapping shapes, one two-color personal emblem, one thin rule, one number column 01–04, one small exact-name label, and LIVE · FRI 22 · 22:00. Geometry—not a portrait or information table—occupies 75 percent.',
   },
   {
     id: 'fashion-week-roster',
     mode: 'both',
     avatarFidelity: 'portrait',
     tone: 'neon',
-    concept: 'fashion-week schedule poster translated into live-show culture, editorial and high contrast',
-    layout: 'overlapping roster blocks, edition number, huge cropped date, vertical name fragments, clean grid with one disruptive symbol and tight microtype at the bottom edge',
+    concept: 'an editorial fashion-week roster translated into a live-show programme with elegant high contrast',
+    layout: 'one tall narrow identity strip occupies the left quarter; five clean horizontal roster lines step down the right side around one oversized date numeral and a small disruptive circle',
     palette: ['electric yellow, black, and small magenta accents', 'mint green, black, and cream', 'pale lavender, black, and red'],
     typography: ['oversized compressed roster type', 'thin rule lines', 'tiny edition codes'],
-    identity: 'For avatar mode, turn avatar cues into a fashion-campaign performer mark that anchors the roster blocks and date crop. For username mode, split the name into roster entries and oversized initials.',
+    identity: 'Allowed elements only: one tall identity strip, five roster lines, one oversized date numeral, one small circle, the exact performer name, and LIVE · FRI 22 · 22:00. Editorial white space separates every line; the performer name appears once as a roster heading.',
   },
   {
     id: 'museum-comedy-label',
     mode: 'both',
     avatarFidelity: 'portrait',
     tone: 'acid',
-    concept: 'comedy museum signage, backstage labels, wayfinding panels, deadpan institutional humor',
-    layout: 'cut-corner sign panels, arrows, room numbers, one bold exhibit-like portrait or name plaque, one oversized cropped punchline word, strong negative space',
+    concept: 'deadpan museum wayfinding for a fictional comedy performance, built from exhibit labels and cut-corner signs',
+    layout: 'one cut-corner identity plaque sits off-center; two small directional arrows lead to three isolated room-number labels across broad quiet space',
     palette: ['deep green, pink, black, and cream', 'red, yellow, black, and off-white', 'blue, cream, and signal red'],
     typography: ['blocky signage type', 'museum label captions', 'numbered room codes'],
-    identity: 'For avatar mode, make avatar cues become the printed exhibit portrait, personal room icon, or signage mascot, not a generic face. For username mode, make the name a room label and punchline-like title.',
+    identity: 'Allowed elements only: one cut-corner identity plaque, exactly two arrows, room numbers 02, 05, and 07, one tiny exhibit caption, the exact performer name, and LIVE · FRI 22 · 22:00. Quiet background occupies at least 45 percent.',
   },
   {
     id: 'xerox-photo-silhouette',
     mode: 'avatar',
     avatarFidelity: 'portrait',
     tone: 'paper',
-    concept: 'photocopied club-night portrait poster, but redrawn as graphic print rather than photo collage',
-    layout: 'large monochrome face or bust in the center, rough crop marks, handwritten lineup fragments, broad empty paper areas',
+    concept: 'a brutal two-tone photocopied club portrait made from one enlarged high-contrast face and physical xerox noise',
+    layout: 'one recognizable face or bust occupies 65 to 75 percent of the canvas, cropped close on one edge; place a small stamped performer name and a single date strip in the remaining space',
     palette: ['black ink on dirty cream with one red accent', 'blue paper with black ink and white scratches', 'salmon paper with black and cyan ink'],
     typography: ['photocopy captions', 'small handwritten schedule notes', 'cropped title stamp'],
-    identity: 'Use avatar mode only: turn the avatar into a rough xerox performer portrait with recognizable hair rhythm, face contour, posture, accessory hints, and expression energy.',
+    identity: 'Use avatar mode only. Allowed elements only: exactly one identity depiction as an edge-cropped high-contrast face, rough copier dust, two crop marks, and one small top-right information stamp. Exactly one paper color plus one dark copier ink; the single face occupies 70 percent.',
   },
 ];
 
@@ -260,63 +232,51 @@ function cueList(items: string[] | undefined, limit: number) {
 
 function avatarCueLine(result?: RecognizeResult | null) {
   if (!result) {
-    return 'Avatar text cue: recognition was unavailable, but the reference avatar image remains authoritative. Preserve the same recognizable face, hairstyle, expression, and distinctive accessories from the reference; do not invent a replacement performer.';
+    return 'Use the reference image as the identity authority; do not invent a replacement performer.';
   }
   const caption = result.caption?.replace(/[{}<>"'`]/g, '').replace(/\s+/g, ' ').trim().slice(0, 160);
   const labels = cueList(result.labels, 8);
   const attributes = cueList(result.attributes, 8);
   const parts = cueList(result.parts, 8);
   return [
-    'Avatar text cue supplements the reference image; preserve the same person rather than inventing a new generic performer.',
-    caption ? `Caption: ${caption}.` : '',
+    caption ? `Avatar cue: ${caption}.` : '',
     labels.length ? `Visual labels: ${labels.join(', ')}.` : '',
     attributes.length ? `Graphic traits: ${attributes.join(', ')}.` : '',
     parts.length ? `Useful parts: ${parts.join(', ')}.` : '',
-    'Use these cues to reinforce at least three visible identity anchors in the portrait: face contour, hairstyle, eyes and brows, expression, or distinctive accessories. Do not make demographic claims.',
   ].filter(Boolean).join(' ');
 }
 
-function avatarIdentityPriorityLine(userName?: string) {
-  const clean = (userName || 'YOU').replace(/[{}<>"'`]/g, '').replace(/\s+/g, ' ').trim().slice(0, 24) || 'YOU';
-  return [
-    'The template supplies print language only; the avatar-derived identity must decide the poster subject.',
-    'Make the recognizable face or upper-body portrait occupy roughly 35 to 60 percent of the canvas so it remains personal in the smaller stacked wall view.',
-    'Preserve the same face shape, hairstyle, eyes and brows, expression, and distinctive accessories wherever visible in the reference; do not substitute a generic face.',
-    'Keep the eyes, nose, and mouth readable. Type may cross the hair, shoulder, or outer silhouette, but not erase the central facial recognition area.',
-    `The name "${clean}" must appear as part of the poster design, woven through the identity mark as cropped letters, stage-title fragments, or vertical type rather than a plain author credit.`,
-    'Do not produce a generic event flyer that would look the same for another user.',
-  ].join(' ');
+function avatarIdentityPriorityLine(_userName?: string) {
+  return `Keep the reference face recognizable at thumbnail size, with the eyes, nose, and mouth unobscured.`;
 }
 
 function previousPosterContrastLine(previous?: PosterEntry) {
   if (!previous?.posterTemplate) {
     return 'No previous poster to avoid; create a decisive one-off composition.';
   }
-  return [
-    'Consecutive-poster contrast: do not make this poster feel like a sibling copy of the last saved poster.',
-    `Avoid repeating the previous template family: ${previous.posterTemplate}.`,
-    'Change at least four visible traits from the previous poster: template structure, background color, headline crop, portrait or symbol shape, type axis, and negative-space rhythm.',
-  ].join(' ');
+  return `Do not repeat the previous ${previous.posterTemplate} composition; change structure, type scale, and negative space.`;
 }
 
-function buildPosterPrompt(mode: PosterPromptMode, userName: string | undefined, seed: string, avatarCue?: RecognizeResult | null, previousPoster?: PosterEntry) {
-  const template = promptTemplateFor(mode, seed, previousPoster?.posterTemplate);
+export function buildPosterPrompt(mode: PosterPromptMode, userName: string | undefined, seed: string, avatarCue?: RecognizeResult | null, previousPoster?: PosterEntry, forcedTemplateId?: string) {
+  const forcedTemplate = forcedTemplateId
+    ? PROMPT_TEMPLATES.find(candidate => candidate.id === forcedTemplateId && (candidate.mode === mode || candidate.mode === 'both'))
+    : undefined;
+  const template = forcedTemplate ?? promptTemplateFor(mode, seed, previousPoster?.posterTemplate);
   const palette = pickForSeed(template.palette, seed, 'palette');
   const type = pickForSeed(template.typography, seed, 'type');
   const identityRule = mode === 'avatar' ? AVATAR_IDENTITY_RULE : USERNAME_IDENTITY_RULE;
   const prompt = [
+    `Art direction: ${template.concept}.`,
+    `Composition: ${template.layout}.`,
+    `Color: ${palette}.`,
+    `Lettering: ${type}.`,
+    template.identity,
     POSTER_PROMPT_BASE,
     identityRule,
     mode === 'avatar' ? avatarCueLine(avatarCue) : '',
-    nameGraphicLine(userName),
-    `Template: ${template.concept}.`,
-    `Layout: ${template.layout}.`,
-    `Palette: ${palette}.`,
-    `Typography: ${type}.`,
-    template.identity,
+    nameGraphicLine(userName, template.id),
     mode === 'avatar' ? avatarIdentityPriorityLine(userName) : '',
     previousPosterContrastLine(previousPoster),
-    'Keep the strongest identity mark in the center vertical safe area. Make this poster look different from other templates in composition, not only in color.',
   ].filter(Boolean).join(' ');
   return { prompt, posterTone: template.tone, templateId: template.id, refAsset: template.refAsset };
 }
