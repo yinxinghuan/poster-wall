@@ -109,13 +109,21 @@ function DetailSocial({
   entry: WallEntry;
 }) {
   const [draft, setDraft] = useState('');
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const comments = game.commentsFor(entry);
   const likes = game.likesFor(entry);
   const liked = game.hasLiked(entry);
 
   useEffect(() => {
     setDraft('');
+    setConfirmDelete(false);
   }, [entry.id]);
+
+  useEffect(() => {
+    if (!confirmDelete) return;
+    const timer = window.setTimeout(() => setConfirmDelete(false), 4000);
+    return () => window.clearTimeout(timer);
+  }, [confirmDelete]);
 
   function submitComment(ev: FormEvent) {
     ev.preventDefault();
@@ -168,6 +176,18 @@ function DetailSocial({
         </div>
 
         <div className="pw-social__actions">
+          {entry.isSelf && (
+            <button
+              type="button"
+              className={`pw-delete ${confirmDelete ? 'pw-delete--confirm' : ''}`}
+              onClick={() => {
+                if (confirmDelete) game.deletePoster(entry.id);
+                else setConfirmDelete(true);
+              }}
+            >
+              {t(confirmDelete ? 'deletePosterConfirm' : 'deletePoster')}
+            </button>
+          )}
           <button
             type="button"
             className={`pw-like ${liked ? 'pw-like--active' : ''}`}

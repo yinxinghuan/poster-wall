@@ -43,6 +43,8 @@ const en = {
   sendComment: 'Send',
   commentCount: '{n} notes',
   likeCount: '{n} likes',
+  deletePoster: 'Delete',
+  deletePosterConfirm: 'Delete now',
   productionKicker: 'Press room',
   productionTitle: 'On press',
   productionPosterSide: 'Poster paper',

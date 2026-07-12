@@ -569,7 +569,13 @@ export function usePosterWall() {
     const stampedWall = wall.map(entry => {
       const likes = uniqueLikesFor(entry.id, likeThreads, mirror?.likes, myUserId);
       const comments = threadFor(entry.id, messageThreads, mirror?.messages, myUserId);
-      return { ...entry, likeCount: likes.length, commentCount: comments.length, likedByMe: likes.some(like => like.fromUserId === myUserId) };
+      return {
+        ...entry,
+        isSelf: entry.userId === myUserId,
+        likeCount: likes.length,
+        commentCount: comments.length,
+        likedByMe: likes.some(like => like.fromUserId === myUserId),
+      };
     });
     return [...selfEntries, ...stampedWall].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).slice(0, MAX_WALL);
   }, [likeThreads, messageThreads, mine, mirror?.likes, mirror?.messages, profile?.head_url, wall]);
@@ -702,6 +708,24 @@ export function usePosterWall() {
     return true;
   }, [mirror, myUserId, persist, refreshWall, trigger]);
 
+  const deletePoster = useCallback((posterId: string) => {
+    if (!posterId || !mirror?.posters.some(poster => poster.id === posterId)) return false;
+    setMirror(prev => {
+      const base = prev ?? mirror;
+      const next: PosterSave = {
+        ...base,
+        posters: base.posters.filter(poster => poster.id !== posterId),
+        likes: (base.likes || []).filter(like => like.target !== posterId),
+        messages: (base.messages || []).filter(message => message.target !== posterId),
+      };
+      persist(next);
+      return next;
+    });
+    setSelected(current => current?.id === posterId ? null : current);
+    setWall(current => current.filter(entry => entry.id !== posterId));
+    return true;
+  }, [mirror, persist]);
+
   const openAuthor = useCallback((entry: WallEntry) => {
     if (!isInAigram || entry.isSelf || !entry.userId || entry.userId === 'self') return;
     openAigramProfile(entry.userId);
@@ -734,6 +758,7 @@ export function usePosterWall() {
     hasLiked,
     toggleLike,
     sendComment,
+    deletePoster,
     generatePoster,
     openAuthor,
     openUserProfile,
